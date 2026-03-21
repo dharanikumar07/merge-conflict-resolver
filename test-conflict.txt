@@ -1,0 +1,7 @@
+ Base Content
+ <<<<<<< HEAD
+Line 2: This is my LOCAL change (from main)
+=======
+Line 2: This is the SERVER change (from feature-branch)
+>>>>>>> feature-branch
+Line 3: Base Content

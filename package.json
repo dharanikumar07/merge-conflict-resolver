@@ -1,0 +1,71 @@
+{
+  "name": "phpstorm-merge-extension",
+  "displayName": "PhpStorm Style Merge",
+  "description": "A lightweight 3-panel merge conflict resolver like PhpStorm.",
+  "version": "0.0.1",
+  "publisher": "your-publisher-id",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:mergeConflictsView"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "phpstorm-merge-sidebar",
+          "title": "Merge Conflicts",
+          "icon": "$(git-merge)"
+        }
+      ]
+    },
+    "views": {
+      "phpstorm-merge-sidebar": [
+        {
+          "id": "mergeConflictsView",
+          "name": "Conflicted Files"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "phpstorm-merge.open",
+        "title": "Open in PhpStorm Merge Tool",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "phpstorm-merge.refresh",
+        "title": "Refresh Conflicts",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "phpstorm-merge.open",
+          "when": "view == mergeConflictsView",
+          "group": "inline"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run bundle",
+    "bundle": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
+    "compile": "tsc -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.70.0",
+    "@types/node": "16.x",
+    "typescript": "^4.7.4",
+    "esbuild": "^0.15.5",
+    "eslint": "^8.20.0"
+  }
+}
