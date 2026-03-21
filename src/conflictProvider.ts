@@ -5,7 +5,28 @@ export class ConflictProvider implements vscode.TreeDataProvider<TreeItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | void> = new vscode.EventEmitter<TreeItem | undefined | void>();
     readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-    constructor() {}
+    private gitApi: any;
+
+    constructor() {
+        this.initGitApi();
+    }
+
+    private async initGitApi() {
+        const gitExtension = vscode.extensions.getExtension('vscode.git');
+        if (gitExtension) {
+            const extension = await gitExtension.activate();
+            this.gitApi = extension.getAPI(1);
+            
+            // Listen for changes in any repository
+            this.gitApi.onDidOpenRepository((repo: any) => {
+                repo.state.onDidChange(() => this.refresh());
+            });
+
+            this.gitApi.repositories.forEach((repo: any) => {
+                repo.state.onDidChange(() => this.refresh());
+            });
+        }
+    }
 
     refresh(): void {
         this._onDidChangeTreeData.fire();
@@ -16,21 +37,22 @@ export class ConflictProvider implements vscode.TreeDataProvider<TreeItem> {
     }
 
     async getChildren(element?: TreeItem): Promise<TreeItem[]> {
-        const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
+        if (!this.gitApi) {
             return [];
         }
 
-        // If no element, we are at the ROOT -> Show Workspace Folders
+        const repositories = this.gitApi.repositories;
+
+        // Root level: Show repositories (Folders)
         if (!element) {
             const folderItems: WorkspaceFolderItem[] = [];
             
-            for (const folder of workspaceFolders) {
-                const conflicts = await this.findConflictedFiles(folder.uri);
-                if (conflicts.length > 0) {
+            for (const repo of repositories) {
+                const conflicts = repo.state.mergeChanges;
+                if (conflicts && conflicts.length > 0) {
                     folderItems.push(new WorkspaceFolderItem(
-                        folder.name,
-                        folder.uri,
+                        path.basename(repo.rootUri.fsPath),
+                        repo.rootUri,
                         conflicts.length,
                         vscode.TreeItemCollapsibleState.Expanded,
                         conflicts
@@ -40,42 +62,21 @@ export class ConflictProvider implements vscode.TreeDataProvider<TreeItem> {
             return folderItems;
         }
 
-        // If element is a Folder -> Show its Conflicted Files
+        // Child level: Show files inside a repository
         if (element instanceof WorkspaceFolderItem) {
-            return element.conflicts;
+            return element.conflicts.map((change: any) => {
+                return new ConflictedFile(
+                    path.basename(change.uri.fsPath),
+                    change.uri,
+                    vscode.TreeItemCollapsibleState.None
+                );
+            });
         }
 
         return [];
     }
-
-    private async findConflictedFiles(folderUri: vscode.Uri): Promise<ConflictedFile[]> {
-        const conflictedFiles: ConflictedFile[] = [];
-        
-        // Search ONLY within this specific workspace folder
-        const relativePattern = new vscode.RelativePattern(folderUri, '**/*');
-        const files = await vscode.workspace.findFiles(relativePattern, '**/node_modules/**');
-
-        for (const file of files) {
-            try {
-                // Using a small buffer check to keep it lightweight (only read first 100KB for markers)
-                const content = await vscode.workspace.fs.readFile(file);
-                if (content.toString().includes('<<<<<<<')) {
-                    conflictedFiles.push(new ConflictedFile(
-                        path.basename(file.fsPath),
-                        file,
-                        vscode.TreeItemCollapsibleState.None
-                    ));
-                }
-            } catch (e) {
-                // Skip unreadable files
-            }
-        }
-
-        return conflictedFiles;
-    }
 }
 
-// Union type for the tree items
 type TreeItem = WorkspaceFolderItem | ConflictedFile;
 
 class WorkspaceFolderItem extends vscode.TreeItem {
@@ -84,13 +85,12 @@ class WorkspaceFolderItem extends vscode.TreeItem {
         public readonly uri: vscode.Uri,
         public readonly conflictCount: number,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-        public readonly conflicts: ConflictedFile[]
+        public readonly conflicts: any[]
     ) {
         super(label, collapsibleState);
-        this.tooltip = `Workspace Folder: ${this.uri.fsPath}`;
+        this.tooltip = `Repository: ${this.uri.fsPath}`;
         this.description = `${conflictCount} conflicts`;
-        this.iconPath = new vscode.ThemeIcon('folder-opened');
-        this.contextValue = 'workspaceRoot';
+        this.iconPath = new vscode.ThemeIcon('repo');
     }
 }
 
@@ -111,6 +111,4 @@ class ConflictedFile extends vscode.TreeItem {
             arguments: [this.uri]
         };
     }
-
-    contextValue = 'conflictedFile';
 }

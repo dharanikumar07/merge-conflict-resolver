@@ -7,6 +7,9 @@
   "engines": {
     "vscode": "^1.70.0"
   },
+  "extensionDependencies": [
+    "vscode.git"
+  ],
   "categories": [
     "Other"
   ],
@@ -48,7 +51,6 @@
       "view/item/context": [
         {
           "command": "phpstorm-merge.open",
-          "when": "view == mergeConflictsView",
           "group": "inline"
         }
       ]
