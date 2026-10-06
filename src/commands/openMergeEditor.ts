@@ -24,7 +24,7 @@ export function uriFromArg(arg: unknown): vscode.Uri | undefined {
 export async function openMergeEditor(sessions: SessionManager, arg?: unknown): Promise<void> {
     const fileUri = uriFromArg(arg) ?? sessions.active()?.source.fileUri ?? vscode.window.activeTextEditor?.document.uri;
     if (!fileUri || fileUri.scheme !== 'file') {
-        void vscode.window.showErrorMessage('Merge Resolver: select a conflicted file to open.');
+        void vscode.window.showErrorMessage('MergeFlow: select a conflicted file to open.');
         return;
     }
 

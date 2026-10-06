@@ -64,7 +64,7 @@ export async function completeMerge(sessions: SessionManager, sessionId?: unknow
     await finish(sessions, session, result);
 }
 
-/** "Accept Left" / "Accept Right": resolves the whole file with one version, like PhpStorm. */
+/** "Accept Left" / "Accept Right": resolves the whole file with one version. */
 export async function acceptFile(sessions: SessionManager, session: MergeSession, side: Side): Promise<void> {
     const name = side === 'ours' ? `Yours (${session.source.labels.oursLabel})` : `Theirs (${session.source.labels.theirsLabel})`;
     if (session.state.dirty) {
@@ -155,7 +155,7 @@ async function offerNextFile(session: MergeSession): Promise<void> {
         'Open Next Conflicted File',
     );
     if (choice) {
-        await vscode.commands.executeCommand('phpstorm-merge.open', vscode.Uri.file(remaining[0].absolutePath));
+        await vscode.commands.executeCommand('mergeflow.open', vscode.Uri.file(remaining[0].absolutePath));
     }
 }
 
@@ -178,7 +178,7 @@ export async function abortMerge(sessions: SessionManager, sessionId?: unknown):
         {
             modal: true,
             detail: `This runs "${command}". Git discards the ${status.operation} state and resets conflicted files, ` +
-                'including any resolutions you have already made. Uncommitted changes in those files may be lost. This cannot be undone from the merge resolver.',
+                'including any resolutions you have already made. Uncommitted changes in those files may be lost. This cannot be undone from MergeFlow.',
         },
         confirm,
     );

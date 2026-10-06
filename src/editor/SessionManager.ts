@@ -34,7 +34,7 @@ export class SessionManager implements vscode.Disposable {
             onViewState: () => this.updateStatus(),
             onMessage: (s, message) => {
                 Promise.resolve(this.messageHandler?.(s, message)).catch((error: Error) =>
-                    vscode.window.showErrorMessage(`Merge Resolver: ${error.message}`));
+                    vscode.window.showErrorMessage(`MergeFlow: ${error.message}`));
             },
             onDispose: s => this.forget(s),
         });
@@ -55,7 +55,7 @@ export class SessionManager implements vscode.Disposable {
         return this.all().find(s => s.source.fileUri.toString() === key);
     }
 
-    /** The session a Compare editor (phpmerge-rev:) belongs to. */
+    /** The session a Compare editor (mergeflow-rev:) belongs to. */
     forUri(uri: vscode.Uri): MergeSession | undefined {
         const id = sessionIdOf(uri);
         return id ? this.sessions.get(id) : undefined;
@@ -93,23 +93,23 @@ export class SessionManager implements vscode.Disposable {
 
     updateStatus(): void {
         const session = this.all().find(s => s.active);
-        void vscode.commands.executeCommand('setContext', 'phpstormMerge.inSession', !!session);
+        void vscode.commands.executeCommand('setContext', 'mergeflow.inSession', !!session);
         if (!session) {
             this.statusBar.hide();
             return;
         }
         const { stats, currentConflict } = session.state;
-        void vscode.commands.executeCommand('setContext', 'phpstormMerge.allResolved', stats.unresolvedConflicts === 0);
+        void vscode.commands.executeCommand('setContext', 'mergeflow.allResolved', stats.unresolvedConflicts === 0);
         const pending = stats.pendingChanges > 0 ? ` · ${stats.pendingChanges} change${stats.pendingChanges === 1 ? '' : 's'} pending` : '';
         if (stats.unresolvedConflicts === 0) {
             this.statusBar.text = '$(check) Complete Merge';
             this.statusBar.tooltip = `All ${stats.conflicts} conflict(s) in ${session.fileName} resolved${pending}. Click to write the result and mark the file resolved.`;
-            this.statusBar.command = 'phpstorm-merge.completeMerge';
+            this.statusBar.command = 'mergeflow.completeMerge';
         } else {
             const position = currentConflict ? `Conflict ${currentConflict} of ${stats.conflicts}` : `${stats.conflicts} conflict${stats.conflicts === 1 ? '' : 's'}`;
             this.statusBar.text = `$(git-merge) ${position} · ${stats.unresolvedConflicts} unresolved${pending}`;
             this.statusBar.tooltip = 'Go to the next unresolved conflict (F7)';
-            this.statusBar.command = 'phpstorm-merge.nextConflict';
+            this.statusBar.command = 'mergeflow.nextConflict';
         }
         this.statusBar.show();
     }

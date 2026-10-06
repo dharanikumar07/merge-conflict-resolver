@@ -75,7 +75,7 @@ test('accept yours / accept theirs on separate conflicts', () => {
     doc.apply(model.accept(second, 'theirs'));
     doc.apply(model.accept(first, 'ours'));
     assert.equal(doc.text, lines('a1', 'b', 'c', 'd', 'e', 'f', 'g2'));
-    // Like PhpStorm, the other side's change stays pending until it is ignored (✕) or appended.
+    // The other side's change stays pending until it is ignored (✕) or appended.
     assert.equal(first.theirsState, 'pending');
     assert.equal(second.oursState, 'pending');
     assert.equal(model.stats().unresolvedConflicts, 2);
@@ -86,7 +86,7 @@ test('accept yours / accept theirs on separate conflicts', () => {
     assert.equal(model.stats().unresolvedConflicts, 0);
 });
 
-test('accepting the second side of a conflict appends it after the first (PhpStorm "Append")', () => {
+test('accepting the second side of a conflict appends it after the first', () => {
     const ours = BASE.replace('c\n', 'c-ours\n');
     const theirs = BASE.replace('c\n', 'c-theirs\n');
     {

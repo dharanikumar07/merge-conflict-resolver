@@ -8,12 +8,12 @@ import { getGitApi } from './git/gitExtension';
 import { ConflictListProvider } from './views/ConflictListProvider';
 
 const COMPARE_COMMANDS: Record<string, ComparisonId> = {
-    'phpstorm-merge.compareYoursTheirs': 'ours-theirs',
-    'phpstorm-merge.compareYoursBase': 'base-ours',
-    'phpstorm-merge.compareTheirsBase': 'base-theirs',
-    'phpstorm-merge.compareResultYours': 'ours-result',
-    'phpstorm-merge.compareResultTheirs': 'theirs-result',
-    'phpstorm-merge.compareResultBase': 'base-result',
+    'mergeflow.compareYoursTheirs': 'ours-theirs',
+    'mergeflow.compareYoursBase': 'base-ours',
+    'mergeflow.compareTheirsBase': 'base-theirs',
+    'mergeflow.compareResultYours': 'ours-result',
+    'mergeflow.compareResultTheirs': 'theirs-result',
+    'mergeflow.compareResultBase': 'base-result',
 };
 
 /** Returned from activate() for integration tests. */
@@ -34,7 +34,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<MergeR
             try {
                 await handler(...args);
             } catch (error) {
-                void vscode.window.showErrorMessage(`Merge Resolver: ${(error as Error).message}`);
+                void vscode.window.showErrorMessage(`MergeFlow: ${(error as Error).message}`);
             }
         });
 
@@ -54,10 +54,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<MergeR
         conflictList,
         treeView,
         vscode.workspace.registerTextDocumentContentProvider(REVISION_SCHEME, revisions),
-        command('phpstorm-merge.open', arg => openMergeEditor(sessions, arg)),
-        command('phpstorm-merge.refresh', () => conflictList.refresh()),
-        command('phpstorm-merge.completeMerge', id => completeMerge(sessions, id)),
-        command('phpstorm-merge.abortMerge', id => abortMerge(sessions, id)),
+        command('mergeflow.open', arg => openMergeEditor(sessions, arg)),
+        command('mergeflow.refresh', () => conflictList.refresh()),
+        command('mergeflow.completeMerge', id => completeMerge(sessions, id)),
+        command('mergeflow.abortMerge', id => abortMerge(sessions, id)),
         ...Object.entries(COMPARE_COMMANDS).map(([id, which]) => command(id, () => compare(sessions, undefined, which))),
         ...registerResolveCommands(sessions, command),
     );

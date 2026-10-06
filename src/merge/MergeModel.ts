@@ -30,7 +30,7 @@ export type ApplyFilter = 'ours' | 'theirs' | 'all';
  * The complete merge state of one file: the three input versions, the list of changed chunks, and where each chunk
  * currently lives in the (editable) result document. Free of any VS Code dependency so it can be unit-tested.
  *
- * The result starts as the base version, like in PhpStorm; changes from either side are then applied into it.
+ * The result starts as the base version; changes from either side are then applied into it.
  */
 export class MergeModel {
     readonly chunks: MergeChunk[];
@@ -117,7 +117,7 @@ export class MergeModel {
     // ---- Actions. Each returns the edit to apply to the result document (if any) and updates chunk state. ----
 
     /**
-     * Accept one side's change. Like PhpStorm, accepting one side of a conflict leaves the other side pending (its
+     * Accept one side's change. Accepting one side of a conflict leaves the other side pending (its
      * arrow stays until it is ignored); if the other side was already accepted, this side is appended after it.
      */
     accept(chunk: MergeChunk, side: Side): ResultEdit | undefined {

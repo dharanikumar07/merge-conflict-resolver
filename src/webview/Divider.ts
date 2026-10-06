@@ -31,7 +31,7 @@ const BUTTON_SIZE = 20;
 const escapeAttr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
 /**
- * The strip between a side pane and the Result, like in PhpStorm:
+ * The strip between a side pane and the Result:
  *   Yours:  [text] [✕ ≫] [line numbers] [connector] [Result]
  *   Theirs: [Result] [connector] [line numbers] [≪ ✕] [text]
  * The connector draws a curved band from each pending change to its region in the Result.
@@ -56,7 +56,7 @@ export class Divider {
                 this.source.act(this.side, Number(button.dataset.chunk), button.dataset.act as ChunkAction);
             }
         });
-        // Scrolling over the strip scrolls the panes, as in PhpStorm.
+        // Scrolling over the strip scrolls the panes.
         el.addEventListener('wheel', e => {
             const editor = this.source.editor('result');
             const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);

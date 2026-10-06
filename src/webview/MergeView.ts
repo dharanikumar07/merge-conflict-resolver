@@ -19,7 +19,7 @@ const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;')
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 /**
- * The PhpStorm-style merge dialog: Yours (read-only) | Result (editable) | Theirs (read-only), with clickable
+ * The MergeFlow merge editor: Yours (read-only) | Result (editable) | Theirs (read-only), with clickable
  * accept/ignore arrows in the dividers. Owns the MergeModel; the extension host only reads its state.
  */
 export class MergeView implements DividerSource {
@@ -72,7 +72,7 @@ export class MergeView implements DividerSource {
                 renderLineHighlight: 'none', occurrencesHighlight: 'off', selectionHighlight: false,
             });
         this.editors = {
-            // The line numbers of the side panes are drawn in the dividers, next to the Result (as in PhpStorm).
+            // The line numbers of the side panes are drawn in the dividers, next to the Result.
             ours: side('ours', this.model.ours, { overviewRulerLanes: 0, scrollbar: { ...options.scrollbar, vertical: 'hidden', verticalScrollbarSize: 0 } }),
             result: monaco.editor.create(root.querySelector('#ed-result')!, { ...options, model: createModel('result', this.model.initialResult), glyphMargin: true, lineNumbers: 'on' }),
             theirs: side('theirs', this.model.theirs, {}),
@@ -572,7 +572,7 @@ export class MergeView implements DividerSource {
             { id: 'merge.revert', label: 'Revert Conflict Resolution', run: run('revertResolution'), contextMenuGroupId: '1_merge', contextMenuOrder: 7 },
         ];
         if (pane !== 'result') {
-            // Undo/redo from a read-only pane act on the Result, like in PhpStorm's merge dialog.
+            // Undo/redo from a read-only pane act on the Result.
             const result = this.editors.result;
             actions.push(
                 { id: 'merge.undo', label: 'Undo in Result', keybindings: [KeyMod.CtrlCmd | KeyCode.KeyZ], run: () => result.trigger('keyboard', 'undo', null) },
@@ -694,7 +694,7 @@ function block(list: Decoration[], model: monaco.editor.ITextModel, r: LineRange
         list.push({ range: new monaco.Range(line, 1, line, 1), options: { isWholeLine: true, className, marginClassName: margin ? className : undefined, overviewRuler } });
         return;
     }
-    // First and last lines carry the block's top/bottom border lines, like PhpStorm's change outlines.
+    // First and last lines carry the block's top/bottom border lines.
     const lines = (from: number, to: number, edges: string) => {
         const classes = `mg-${style}${edges}`;
         list.push({

@@ -1,22 +1,22 @@
-/* PhpStorm-style merge dialog. Workbench colors come from VS Code (--vscode-*); change colors follow PhpStorm's
-   diff palette and can be overridden with the phpstormMerge.* colors in `workbench.colorCustomizations`. */
+/* MergeFlow merge editor. Workbench colors come from VS Code (--vscode-*); change colors use MergeFlow's
+   palette and can be overridden with the mergeflow.* colors in `workbench.colorCustomizations`. */
 
 body {
-    --mg-conflict-bg: var(--vscode-phpstormMerge-conflictBackground, #4a2e2a);
-    --mg-conflict-word: var(--vscode-phpstormMerge-conflictWordBackground, #713b33);
-    --mg-conflict-border: var(--vscode-phpstormMerge-conflictBorder, #a05a4c);
+    --mg-conflict-bg: var(--vscode-mergeflow-conflictBackground, #4a2e2a);
+    --mg-conflict-word: var(--vscode-mergeflow-conflictWordBackground, #713b33);
+    --mg-conflict-border: var(--vscode-mergeflow-conflictBorder, #a05a4c);
     --mg-conflict-icon: #f28b76;
-    --mg-modified-bg: var(--vscode-phpstormMerge-modifiedBackground, #253a50);
-    --mg-modified-word: var(--vscode-phpstormMerge-modifiedWordBackground, #2f5a88);
-    --mg-modified-border: var(--vscode-phpstormMerge-modifiedBorder, #4c7db3);
+    --mg-modified-bg: var(--vscode-mergeflow-modifiedBackground, #253a50);
+    --mg-modified-word: var(--vscode-mergeflow-modifiedWordBackground, #2f5a88);
+    --mg-modified-border: var(--vscode-mergeflow-modifiedBorder, #4c7db3);
     --mg-modified-icon: #7db3f5;
-    --mg-added-bg: var(--vscode-phpstormMerge-addedBackground, #263e2d);
-    --mg-added-word: var(--vscode-phpstormMerge-addedWordBackground, #31633e);
-    --mg-added-border: var(--vscode-phpstormMerge-addedBorder, #4c8b5b);
+    --mg-added-bg: var(--vscode-mergeflow-addedBackground, #263e2d);
+    --mg-added-word: var(--vscode-mergeflow-addedWordBackground, #31633e);
+    --mg-added-border: var(--vscode-mergeflow-addedBorder, #4c8b5b);
     --mg-added-icon: #77cc8a;
-    --mg-deleted-bg: var(--vscode-phpstormMerge-deletedBackground, #393c3e);
-    --mg-deleted-word: var(--vscode-phpstormMerge-deletedWordBackground, #54585b);
-    --mg-deleted-border: var(--vscode-phpstormMerge-deletedBorder, #737b81);
+    --mg-deleted-bg: var(--vscode-mergeflow-deletedBackground, #393c3e);
+    --mg-deleted-word: var(--vscode-mergeflow-deletedWordBackground, #54585b);
+    --mg-deleted-border: var(--vscode-mergeflow-deletedBorder, #737b81);
     --mg-deleted-icon: #b4bbc1;
     --mg-button-hover: rgba(255, 255, 255, 0.12);
     --mg-chrome: var(--vscode-editorGroupHeader-tabsBackground, var(--vscode-sideBar-background, var(--vscode-editor-background)));
@@ -24,21 +24,21 @@ body {
 }
 
 body.vscode-light {
-    --mg-conflict-bg: var(--vscode-phpstormMerge-conflictBackground, #ffe4dd);
-    --mg-conflict-word: var(--vscode-phpstormMerge-conflictWordBackground, #ffc3b4);
-    --mg-conflict-border: var(--vscode-phpstormMerge-conflictBorder, #ef9a85);
+    --mg-conflict-bg: var(--vscode-mergeflow-conflictBackground, #ffe4dd);
+    --mg-conflict-word: var(--vscode-mergeflow-conflictWordBackground, #ffc3b4);
+    --mg-conflict-border: var(--vscode-mergeflow-conflictBorder, #ef9a85);
     --mg-conflict-icon: #cf4126;
-    --mg-modified-bg: var(--vscode-phpstormMerge-modifiedBackground, #dde8fb);
-    --mg-modified-word: var(--vscode-phpstormMerge-modifiedWordBackground, #b8cef6);
-    --mg-modified-border: var(--vscode-phpstormMerge-modifiedBorder, #86a9e6);
+    --mg-modified-bg: var(--vscode-mergeflow-modifiedBackground, #dde8fb);
+    --mg-modified-word: var(--vscode-mergeflow-modifiedWordBackground, #b8cef6);
+    --mg-modified-border: var(--vscode-mergeflow-modifiedBorder, #86a9e6);
     --mg-modified-icon: #2563c9;
-    --mg-added-bg: var(--vscode-phpstormMerge-addedBackground, #dcf1dc);
-    --mg-added-word: var(--vscode-phpstormMerge-addedWordBackground, #b2deb2);
-    --mg-added-border: var(--vscode-phpstormMerge-addedBorder, #7bbf7b);
+    --mg-added-bg: var(--vscode-mergeflow-addedBackground, #dcf1dc);
+    --mg-added-word: var(--vscode-mergeflow-addedWordBackground, #b2deb2);
+    --mg-added-border: var(--vscode-mergeflow-addedBorder, #7bbf7b);
     --mg-added-icon: #2a8a2a;
-    --mg-deleted-bg: var(--vscode-phpstormMerge-deletedBackground, #ececec);
-    --mg-deleted-word: var(--vscode-phpstormMerge-deletedWordBackground, #d2d2d2);
-    --mg-deleted-border: var(--vscode-phpstormMerge-deletedBorder, #b1b1b1);
+    --mg-deleted-bg: var(--vscode-mergeflow-deletedBackground, #ececec);
+    --mg-deleted-word: var(--vscode-mergeflow-deletedWordBackground, #d2d2d2);
+    --mg-deleted-border: var(--vscode-mergeflow-deletedBorder, #b1b1b1);
     --mg-deleted-icon: #5f5f5f;
     --mg-button-hover: rgba(0, 0, 0, 0.08);
 }

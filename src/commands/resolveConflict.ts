@@ -9,7 +9,7 @@ export type { ComparisonId } from '../shared/protocol';
 export function sessionFromArgs(sessions: SessionManager, sessionId: unknown): MergeSession | undefined {
     const session = typeof sessionId === 'string' ? sessions.get(sessionId) : sessions.active();
     if (!session) {
-        void vscode.window.showWarningMessage('Merge Resolver: open a conflicted file in the merge resolver first.');
+        void vscode.window.showWarningMessage('MergeFlow: open a conflicted file in MergeFlow first.');
     }
     return session;
 }
@@ -17,19 +17,19 @@ export function sessionFromArgs(sessions: SessionManager, sessionId: unknown): M
 export type RegisterCommand = (id: string, handler: (...args: any[]) => unknown) => vscode.Disposable;
 
 const ACTIONS: Record<string, MergeAction> = {
-    'phpstorm-merge.acceptYours': 'acceptYours',
-    'phpstorm-merge.acceptTheirs': 'acceptTheirs',
-    'phpstorm-merge.ignoreYours': 'ignoreYours',
-    'phpstorm-merge.ignoreTheirs': 'ignoreTheirs',
-    'phpstorm-merge.acceptBoth': 'acceptBoth',
-    'phpstorm-merge.resolveSimple': 'resolveSimple',
-    'phpstorm-merge.resolveAllSimple': 'resolveAllSimple',
-    'phpstorm-merge.revertResolution': 'revertResolution',
-    'phpstorm-merge.applyNonConflicting': 'applyNonConflicting',
-    'phpstorm-merge.applyNonConflictingYours': 'applyNonConflictingYours',
-    'phpstorm-merge.applyNonConflictingTheirs': 'applyNonConflictingTheirs',
-    'phpstorm-merge.nextConflict': 'nextConflict',
-    'phpstorm-merge.previousConflict': 'previousConflict',
+    'mergeflow.acceptYours': 'acceptYours',
+    'mergeflow.acceptTheirs': 'acceptTheirs',
+    'mergeflow.ignoreYours': 'ignoreYours',
+    'mergeflow.ignoreTheirs': 'ignoreTheirs',
+    'mergeflow.acceptBoth': 'acceptBoth',
+    'mergeflow.resolveSimple': 'resolveSimple',
+    'mergeflow.resolveAllSimple': 'resolveAllSimple',
+    'mergeflow.revertResolution': 'revertResolution',
+    'mergeflow.applyNonConflicting': 'applyNonConflicting',
+    'mergeflow.applyNonConflictingYours': 'applyNonConflictingYours',
+    'mergeflow.applyNonConflictingTheirs': 'applyNonConflictingTheirs',
+    'mergeflow.nextConflict': 'nextConflict',
+    'mergeflow.previousConflict': 'previousConflict',
 };
 
 /**
@@ -43,11 +43,11 @@ export function registerResolveCommands(sessions: SessionManager, register: Regi
             if (session) {
                 const reply = await session.request(action, { chunkId: typeof chunkId === 'number' ? chunkId : undefined });
                 if (reply.error) {
-                    void vscode.window.showInformationMessage(`Merge Resolver: ${reply.error}`);
+                    void vscode.window.showInformationMessage(`MergeFlow: ${reply.error}`);
                 }
             }
         })),
-        register('phpstorm-merge.compare', (sessionId?: unknown) => compare(sessions, sessionId)),
+        register('mergeflow.compare', (sessionId?: unknown) => compare(sessions, sessionId)),
     ];
 }
 

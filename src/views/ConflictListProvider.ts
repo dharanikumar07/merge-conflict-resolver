@@ -26,14 +26,14 @@ class FileNode extends vscode.TreeItem {
             : new vscode.ThemeIcon('warning', new vscode.ThemeColor('problemsWarningIcon.foreground'));
         this.contextValue = resolved ? 'resolvedFile' : 'conflictedFile';
         if (!resolved) {
-            this.command = { command: 'phpstorm-merge.open', title: 'Open in Merge Resolver', arguments: [uri] };
+            this.command = { command: 'mergeflow.open', title: 'Open in MergeFlow', arguments: [uri] };
         }
     }
 }
 
 /**
  * "MERGE CONFLICTS" view: conflicted files from the Git extension plus files completed in this window.
- * Also publishes the `phpstormMerge.conflictedPaths` context key used by the Explorer menu.
+ * Also publishes the `mergeflow.conflictedPaths` context key used by the Explorer menu.
  */
 export class ConflictListProvider implements vscode.TreeDataProvider<Node>, vscode.Disposable {
     private readonly changeEmitter = new vscode.EventEmitter<void>();
@@ -61,7 +61,7 @@ export class ConflictListProvider implements vscode.TreeDataProvider<Node>, vsco
 
     refresh(): void {
         const conflicted = this.conflictedUris();
-        void vscode.commands.executeCommand('setContext', 'phpstormMerge.conflictedPaths', conflicted.map(u => u.fsPath));
+        void vscode.commands.executeCommand('setContext', 'mergeflow.conflictedPaths', conflicted.map(u => u.fsPath));
         if (this.view) {
             const resolved = [...this.sessions.completedFiles].filter(f => !conflicted.some(u => u.fsPath === f)).length;
             this.view.message = conflicted.length === 0

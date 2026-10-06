@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 /** Read-only versions (Base / Yours / Theirs, and Result snapshots) used by the Compare commands. */
-export const REVISION_SCHEME = 'phpmerge-rev';
+export const REVISION_SCHEME = 'mergeflow-rev';
 
 export type Revision = 'ours' | 'theirs' | 'base' | 'result';
 

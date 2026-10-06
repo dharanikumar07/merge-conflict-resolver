@@ -4,7 +4,7 @@
 
 # MergeFlow
 
-MergeFlow is a Git merge conflict resolver for Visual Studio Code with a clean three-pane layout: **Yours | Result | Theirs**. The layout is inspired by the merge dialog in JetBrains IDEs such as PhpStorm. You can see both versions side by side, take changes with one click, and edit the final result directly.
+MergeFlow is a Git merge conflict resolver for Visual Studio Code with a clean three-pane layout: **Yours | Result | Theirs**. You can see both versions side by side, take changes with one click, and edit the final result directly.
 
 ## Features
 
@@ -53,9 +53,9 @@ When a side has been handled, its highlight disappears.
 1. Run a Git operation that produces conflicts, for example `git merge feature`.
 2. Open a conflicted file in MergeFlow in any of these ways:
    - the **Merge Conflicts** view in the Activity Bar (click a file)
-   - right-click the file in the Explorer or in Source Control → **Open in Merge Resolver**
-   - the **Open in Merge Resolver** button in the editor title bar of a conflicted file
-   - the Command Palette: **MergeFlow: Open in Merge Resolver**
+   - right-click the file in the Explorer or in Source Control → **Open in MergeFlow**
+   - the **Open in MergeFlow** button in the editor title bar of a conflicted file
+   - the Command Palette: **MergeFlow: Open in MergeFlow**
 3. Resolve each change:
    - Click `≫` / `≪` to accept a side, or `✕` to ignore it.
    - Use the toolbar to apply all non-conflicting changes, or the magic wand to resolve simple conflicts.
@@ -77,9 +77,9 @@ When a side has been handled, its highlight disappears.
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| `phpstormMerge.autoApplyNonConflictingChanges` | `false` | Apply all non-conflicting changes automatically when a file is opened in MergeFlow. |
+| `mergeflow.autoApplyNonConflictingChanges` | `false` | Apply all non-conflicting changes automatically when a file is opened in MergeFlow. |
 
-The change colors can be customized with the `phpstormMerge.*` colors in `workbench.colorCustomizations`, for example `phpstormMerge.conflictBackground`.
+The change colors can be customized with the `mergeflow.*` colors in `workbench.colorCustomizations`, for example `mergeflow.conflictBackground`.
 
 ## Screenshots
 

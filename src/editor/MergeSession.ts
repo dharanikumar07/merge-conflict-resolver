@@ -6,7 +6,7 @@ import { MergeStats } from '../merge/MergeModel';
 import type { ActionReply, HostMessage, MergeAction, ViewState, WebviewMessage } from '../shared/protocol';
 import { Revision, RevisionContentProvider, revisionUri } from './documents';
 
-export const WEBVIEW_TYPE = 'phpstormMerge.mergeEditor';
+export const WEBVIEW_TYPE = 'mergeflow.mergeEditor';
 
 export interface SessionServices {
     revisions: RevisionContentProvider;
@@ -153,7 +153,7 @@ export class MergeSession implements vscode.Disposable {
                         ...this.source.texts,
                         oursLabel: this.source.labels.oursLabel,
                         theirsLabel: this.source.labels.theirsLabel,
-                        autoApplyNonConflicting: vscode.workspace.getConfiguration('phpstormMerge').get<boolean>('autoApplyNonConflictingChanges') ?? false,
+                        autoApplyNonConflicting: vscode.workspace.getConfiguration('mergeflow').get<boolean>('autoApplyNonConflictingChanges') ?? false,
                     },
                 });
                 this.ready = true;

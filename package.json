@@ -3,7 +3,7 @@
   "displayName": "MergeFlow",
   "description": "A modern Git merge conflict resolver with a clean three-pane experience.",
   "version": "0.1.0",
-  "publisher": "your-publisher-id",
+  "publisher": "mergeflow",
   "icon": "images/icon.png",
   "galleryBanner": {
     "color": "#0d1117",
@@ -45,14 +45,14 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "phpstorm-merge-sidebar",
+          "id": "mergeflow-sidebar",
           "title": "Merge Conflicts",
           "icon": "$(git-merge)"
         }
       ]
     },
     "views": {
-      "phpstorm-merge-sidebar": [
+      "mergeflow-sidebar": [
         {
           "id": "mergeConflictsView",
           "name": "Merge Conflicts"
@@ -61,136 +61,136 @@
     },
     "commands": [
       {
-        "command": "phpstorm-merge.open",
-        "title": "Open in Merge Resolver",
+        "command": "mergeflow.open",
+        "title": "Open in MergeFlow",
         "category": "MergeFlow",
         "icon": "$(git-merge)"
       },
       {
-        "command": "phpstorm-merge.refresh",
+        "command": "mergeflow.refresh",
         "title": "Refresh Conflicts",
         "category": "MergeFlow",
         "icon": "$(refresh)"
       },
       {
-        "command": "phpstorm-merge.nextConflict",
+        "command": "mergeflow.nextConflict",
         "title": "Next Conflict",
         "category": "MergeFlow",
         "icon": "$(arrow-down)"
       },
       {
-        "command": "phpstorm-merge.previousConflict",
+        "command": "mergeflow.previousConflict",
         "title": "Previous Conflict",
         "category": "MergeFlow",
         "icon": "$(arrow-up)"
       },
       {
-        "command": "phpstorm-merge.acceptYours",
+        "command": "mergeflow.acceptYours",
         "title": "Accept Left (Yours)",
         "category": "MergeFlow",
         "icon": "$(arrow-right)"
       },
       {
-        "command": "phpstorm-merge.acceptTheirs",
+        "command": "mergeflow.acceptTheirs",
         "title": "Accept Right (Theirs)",
         "category": "MergeFlow",
         "icon": "$(arrow-left)"
       },
       {
-        "command": "phpstorm-merge.acceptBoth",
+        "command": "mergeflow.acceptBoth",
         "title": "Accept Both (Yours, then Theirs)",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.ignoreYours",
+        "command": "mergeflow.ignoreYours",
         "title": "Ignore Left (Yours)",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.ignoreTheirs",
+        "command": "mergeflow.ignoreTheirs",
         "title": "Ignore Right (Theirs)",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.resolveSimple",
+        "command": "mergeflow.resolveSimple",
         "title": "Resolve Simple Conflict",
         "category": "MergeFlow",
         "icon": "$(wand)"
       },
       {
-        "command": "phpstorm-merge.resolveAllSimple",
+        "command": "mergeflow.resolveAllSimple",
         "title": "Resolve All Simple Conflicts",
         "category": "MergeFlow",
         "icon": "$(wand)"
       },
       {
-        "command": "phpstorm-merge.applyNonConflicting",
+        "command": "mergeflow.applyNonConflicting",
         "title": "Apply All Non-Conflicting Changes",
         "category": "MergeFlow",
         "icon": "$(check-all)"
       },
       {
-        "command": "phpstorm-merge.applyNonConflictingYours",
+        "command": "mergeflow.applyNonConflictingYours",
         "title": "Apply Non-Conflicting Changes from Yours",
         "category": "MergeFlow",
         "icon": "$(arrow-right)"
       },
       {
-        "command": "phpstorm-merge.applyNonConflictingTheirs",
+        "command": "mergeflow.applyNonConflictingTheirs",
         "title": "Apply Non-Conflicting Changes from Theirs",
         "category": "MergeFlow",
         "icon": "$(arrow-left)"
       },
       {
-        "command": "phpstorm-merge.revertResolution",
+        "command": "mergeflow.revertResolution",
         "title": "Revert Conflict Resolution",
         "category": "MergeFlow",
         "icon": "$(discard)"
       },
       {
-        "command": "phpstorm-merge.compare",
+        "command": "mergeflow.compare",
         "title": "Compare...",
         "category": "MergeFlow",
         "icon": "$(git-compare)"
       },
       {
-        "command": "phpstorm-merge.compareYoursTheirs",
+        "command": "mergeflow.compareYoursTheirs",
         "title": "Compare Yours with Theirs",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.compareYoursBase",
+        "command": "mergeflow.compareYoursBase",
         "title": "Compare Yours with Base",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.compareTheirsBase",
+        "command": "mergeflow.compareTheirsBase",
         "title": "Compare Theirs with Base",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.compareResultYours",
+        "command": "mergeflow.compareResultYours",
         "title": "Compare Result with Yours",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.compareResultTheirs",
+        "command": "mergeflow.compareResultTheirs",
         "title": "Compare Result with Theirs",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.compareResultBase",
+        "command": "mergeflow.compareResultBase",
         "title": "Compare Result with Base",
         "category": "MergeFlow"
       },
       {
-        "command": "phpstorm-merge.completeMerge",
+        "command": "mergeflow.completeMerge",
         "title": "Complete Merge",
         "category": "MergeFlow",
         "icon": "$(check)"
       },
       {
-        "command": "phpstorm-merge.abortMerge",
+        "command": "mergeflow.abortMerge",
         "title": "Abort Merge...",
         "category": "MergeFlow",
         "icon": "$(close)"
@@ -199,131 +199,131 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "phpstorm-merge.nextConflict",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.nextConflict",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.previousConflict",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.previousConflict",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.acceptYours",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.acceptYours",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.acceptTheirs",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.acceptTheirs",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.acceptBoth",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.acceptBoth",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.ignoreYours",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.ignoreYours",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.ignoreTheirs",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.ignoreTheirs",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.resolveSimple",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.resolveSimple",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.resolveAllSimple",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.resolveAllSimple",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.applyNonConflicting",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.applyNonConflicting",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.applyNonConflictingYours",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.applyNonConflictingYours",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.applyNonConflictingTheirs",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.applyNonConflictingTheirs",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.revertResolution",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.revertResolution",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.compare",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.compare",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.compareYoursTheirs",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.compareYoursTheirs",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.compareYoursBase",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.compareYoursBase",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.compareTheirsBase",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.compareTheirsBase",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.compareResultYours",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.compareResultYours",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.compareResultTheirs",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.compareResultTheirs",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.compareResultBase",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.compareResultBase",
+          "when": "mergeflow.inSession"
         },
         {
-          "command": "phpstorm-merge.completeMerge",
-          "when": "phpstormMerge.inSession"
+          "command": "mergeflow.completeMerge",
+          "when": "mergeflow.inSession"
         }
       ],
       "editor/title": [
         {
-          "command": "phpstorm-merge.open",
-          "when": "resourceScheme == file && resourcePath in phpstormMerge.conflictedPaths",
+          "command": "mergeflow.open",
+          "when": "resourceScheme == file && resourcePath in mergeflow.conflictedPaths",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
-          "command": "phpstorm-merge.open",
-          "when": "resourceScheme == file && resourcePath in phpstormMerge.conflictedPaths",
+          "command": "mergeflow.open",
+          "when": "resourceScheme == file && resourcePath in mergeflow.conflictedPaths",
           "group": "3_compare"
         }
       ],
       "scm/resourceState/context": [
         {
-          "command": "phpstorm-merge.open",
+          "command": "mergeflow.open",
           "when": "scmProvider == git && scmResourceGroup == merge",
           "group": "inline"
         },
         {
-          "command": "phpstorm-merge.open",
+          "command": "mergeflow.open",
           "when": "scmProvider == git && scmResourceGroup == merge",
           "group": "navigation"
         }
       ],
       "view/title": [
         {
-          "command": "phpstorm-merge.refresh",
+          "command": "mergeflow.refresh",
           "when": "view == mergeConflictsView",
           "group": "navigation"
         },
         {
-          "command": "phpstorm-merge.abortMerge",
+          "command": "mergeflow.abortMerge",
           "when": "view == mergeConflictsView",
           "group": "2_abort"
         }
       ],
       "view/item/context": [
         {
-          "command": "phpstorm-merge.open",
+          "command": "mergeflow.open",
           "when": "view == mergeConflictsView && viewItem == conflictedFile",
           "group": "inline"
         }
@@ -331,29 +331,29 @@
     },
     "keybindings": [
       {
-        "command": "phpstorm-merge.nextConflict",
+        "command": "mergeflow.nextConflict",
         "key": "f7",
-        "when": "activeWebviewPanelId == 'phpstormMerge.mergeEditor'"
+        "when": "activeWebviewPanelId == 'mergeflow.mergeEditor'"
       },
       {
-        "command": "phpstorm-merge.previousConflict",
+        "command": "mergeflow.previousConflict",
         "key": "shift+f7",
-        "when": "activeWebviewPanelId == 'phpstormMerge.mergeEditor'"
+        "when": "activeWebviewPanelId == 'mergeflow.mergeEditor'"
       }
     ],
     "configuration": {
       "title": "MergeFlow",
       "properties": {
-        "phpstormMerge.autoApplyNonConflictingChanges": {
+        "mergeflow.autoApplyNonConflictingChanges": {
           "type": "boolean",
           "default": false,
-          "description": "Apply all non-conflicting changes automatically when a file is opened in the merge resolver (like PhpStorm's \"Automatically apply non-conflicting changes\")."
+          "description": "Apply all non-conflicting changes automatically when a file is opened in MergeFlow."
         }
       }
     },
     "colors": [
       {
-        "id": "phpstormMerge.conflictBackground",
+        "id": "mergeflow.conflictBackground",
         "description": "Background of unresolved conflicts in the merge editor.",
         "defaults": {
           "dark": "#4a2e2a",
@@ -363,7 +363,7 @@
         }
       },
       {
-        "id": "phpstormMerge.conflictWordBackground",
+        "id": "mergeflow.conflictWordBackground",
         "description": "Background of changed words inside conflicts.",
         "defaults": {
           "dark": "#713b33",
@@ -373,7 +373,7 @@
         }
       },
       {
-        "id": "phpstormMerge.conflictBorder",
+        "id": "mergeflow.conflictBorder",
         "description": "Outline and connector edge of conflicts.",
         "defaults": {
           "dark": "#a05a4c",
@@ -383,7 +383,7 @@
         }
       },
       {
-        "id": "phpstormMerge.modifiedBackground",
+        "id": "mergeflow.modifiedBackground",
         "description": "Background of modified lines (non-conflicting changes).",
         "defaults": {
           "dark": "#253a50",
@@ -393,7 +393,7 @@
         }
       },
       {
-        "id": "phpstormMerge.modifiedWordBackground",
+        "id": "mergeflow.modifiedWordBackground",
         "description": "Background of changed words inside modified lines.",
         "defaults": {
           "dark": "#2f5a88",
@@ -403,7 +403,7 @@
         }
       },
       {
-        "id": "phpstormMerge.modifiedBorder",
+        "id": "mergeflow.modifiedBorder",
         "description": "Outline and connector edge of modified lines.",
         "defaults": {
           "dark": "#4c7db3",
@@ -413,7 +413,7 @@
         }
       },
       {
-        "id": "phpstormMerge.addedBackground",
+        "id": "mergeflow.addedBackground",
         "description": "Background of added lines (non-conflicting changes).",
         "defaults": {
           "dark": "#263e2d",
@@ -423,7 +423,7 @@
         }
       },
       {
-        "id": "phpstormMerge.addedWordBackground",
+        "id": "mergeflow.addedWordBackground",
         "description": "Background of changed words inside added lines.",
         "defaults": {
           "dark": "#31633e",
@@ -433,7 +433,7 @@
         }
       },
       {
-        "id": "phpstormMerge.addedBorder",
+        "id": "mergeflow.addedBorder",
         "description": "Outline and connector edge of added lines.",
         "defaults": {
           "dark": "#4c8b5b",
@@ -443,7 +443,7 @@
         }
       },
       {
-        "id": "phpstormMerge.deletedBackground",
+        "id": "mergeflow.deletedBackground",
         "description": "Background of lines a side deletes.",
         "defaults": {
           "dark": "#393c3e",
@@ -453,7 +453,7 @@
         }
       },
       {
-        "id": "phpstormMerge.deletedWordBackground",
+        "id": "mergeflow.deletedWordBackground",
         "description": "Background of deleted words.",
         "defaults": {
           "dark": "#54585b",
@@ -463,7 +463,7 @@
         }
       },
       {
-        "id": "phpstormMerge.deletedBorder",
+        "id": "mergeflow.deletedBorder",
         "description": "Outline and connector edge of deleted lines.",
         "defaults": {
           "dark": "#737b81",
