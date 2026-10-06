@@ -1,5 +1,155 @@
- Base Content
-Line 2: This is my LOCAL change (from main)
-Line 2: This is the SERVER change (from feature-branch)
-Line 3: Base Content This is the main branch version
-hii i am dharanikumar 
+# FlowForge Configuration
+
+application:
+  name: FlowForge Platform
+  version: 2.0.0
+  environment: staging
+  debug: false
+
+server:
+  host: 127.0.0.1
+  port: 8081
+  context-path: /service
+
+database:
+  driver: postgresql
+  host: staging-db.example.com
+  port: 5432
+  name: flowforge_staging
+  username: staging_user
+  password: staging-password
+  pool:
+    minimum-idle: 8
+    maximum-pool-size: 30
+    connection-timeout: 45000
+
+redis:
+  host: localhost
+  port: 6379
+  database: 0
+  timeout: 2000
+  enabled: true
+
+kafka:
+  bootstrap-servers: localhost:9092
+  consumer-group: flowforge-worker
+  topic:
+    workflow-events: workflow-events
+    task-events: task-events
+    notification-events: notification-events
+
+workflow:
+  enabled: true
+  max-retries: 2
+  retry-delay: 3000
+  execution-timeout: 180000
+  max-concurrent-executions: 25
+
+logging:
+  level: INFO
+  file: logs/flowforge.log
+  max-file-size: 10MB
+  max-history: 30
+
+security:
+  jwt:
+    enabled: true
+    expiration: 3600
+    refresh-expiration: 86400
+  cors:
+    enabled: true
+    allowed-origins:
+      - http://localhost:3000
+
+notifications:
+  email:
+    enabled: true
+    provider: smtp
+    host: smtp.example.com
+    port: 587
+
+  slack:
+    enabled: true
+    webhook-url: https://hooks.slack.com/example
+
+integrations:
+  github:
+    enabled: true
+    api-url: https://api.github.com
+
+  stripe:
+    enabled: true
+    api-url: https://api.stripe.com
+
+  calendar:
+    enabled: false
+    provider: google
+
+storage:
+  provider: s3
+  bucket: flowforge-development
+  region: us-east-1
+
+scheduler:
+  enabled: true
+  interval: 60000
+
+worker:
+  enabled: true
+  threads: 10
+  queue-size: 500
+
+metrics:
+  enabled: true
+  endpoint: /actuator/metrics
+
+health:
+  enabled: true
+  enabled: based_on_main_config
+  endpoint: /actuator/health
+
+api:
+  version: v1
+  rate-limit:
+    enabled: true
+    requests-per-minute: 100
+
+features:
+  workflow-editor: true
+  webhook-trigger: true
+  cron-trigger: true
+  github-trigger: true
+  slack-trigger: true
+  email-action: true
+  http-action: true
+
+backup:
+  enabled: true
+  interval: daily
+  retention-days: 7
+
+development:
+  hot-reload: true
+  mock-integrations: true
+  seed-data: true
+
+testing:
+  enabled: true
+  integration-tests: true
+  test-database: flowforge_test
+
+performance:
+  cache-enabled: true
+  compression-enabled: true
+  batch-size: 100
+
+monitoring:
+  prometheus: true
+  grafana: true
+  tracing: false
+
+shutdown:
+  graceful: true
+  timeout: 30000
+
+# End of configuration
