@@ -3,8 +3,8 @@
 application:
   name: FlowForge
   version: 1.0.0
-  environment: production
-  debug: false
+  environment: development
+  debug: true
 
 server:
   host: 0.0.0.0
@@ -13,21 +13,21 @@ server:
 
 database:
   driver: postgresql
-  host: production-db.example.com
+  host: localhost
   port: 5432
-  name: flowforge_production
-  username: flowforge_user
-  password: secure-password
+  name: flowforge
+  username: postgres
+  password: password
   pool:
-    minimum-idle: 10
-    maximum-pool-size: 50
-    connection-timeout: 60000
+    minimum-idle: 5
+    maximum-pool-size: 20
+    connection-timeout: 30000
 
 redis:
-  host: redis-production.example.com
+  host: localhost
   port: 6379
-  database: 1
-  timeout: 5000
+  database: 0
+  timeout: 2000
   enabled: true
 
 kafka:
@@ -36,14 +36,14 @@ kafka:
   topic:
     workflow-events: workflow-events
     task-events: task-events
-    notification-events: job-events
+    notification-events: notification-events
 
 workflow:
   enabled: true
-  max-retries: 2
-  retry-delay: 3000
-  execution-timeout: 180000
-  max-concurrent-executions: 25
+  max-retries: 3
+  retry-delay: 5000
+  execution-timeout: 300000
+  max-concurrent-executions: 10
 
 logging:
   level: INFO
@@ -74,13 +74,12 @@ notifications:
 
 integrations:
   github:
-    enabled: false
+    enabled: true
     api-url: https://api.github.com
 
   stripe:
     enabled: true
     api-url: https://api.stripe.com
-    payment_security: high
 
   calendar:
     enabled: false
@@ -149,14 +148,5 @@ monitoring:
   prometheus: true
   grafana: false
   tracing: true
-
-  metrics:
-  enabled: true
-  endpoint: /actuator/prometheus
-
-  backup:
-  enabled: true
-  interval: hourly
-  retention-days: 30
 
 # End of configuration

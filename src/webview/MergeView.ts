@@ -11,6 +11,7 @@ const PANES: readonly Pane[] = ['ours', 'result', 'theirs'];
 const SIDES: readonly Side[] = ['ours', 'theirs'];
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.userAgent);
 const STATE_DELAY_MS = 40;
+const MIN_PANE_WIDTH = 120;
 
 type Decoration = monaco.editor.IModelDeltaDecoration;
 
@@ -92,6 +93,7 @@ export class MergeView implements DividerSource {
 
         this.wireEditors();
         this.wireToolbar();
+        this.wireSplitters();
         if (data.autoApplyNonConflicting) {
             this.applyEdits(this.model.applyNonConflicting('all'));
         }
@@ -609,6 +611,53 @@ export class MergeView implements DividerSource {
             }
         });
         // Outside the editors (e.g. on a toolbar button), F7 / Shift+F7 reach VS Code's keybindings (package.json).
+    }
+
+    /**
+     * Dragging a divider resizes the two panes next to it (double-click restores equal widths). Widths are kept as
+     * flex-grow ratios so the split survives resizing the editor area; Monaco re-lays itself out (automaticLayout).
+     */
+    private wireSplitters(): void {
+        const panes = [...this.root.querySelectorAll<HTMLElement>('.panes > .col-side, .panes > .col-result')];
+        const setWidths = (widths: readonly number[]) => panes.forEach((pane, k) => { pane.style.flex = `${widths[k]} 1 0`; });
+        const handles = [...this.root.querySelectorAll<HTMLElement>('.panes > .col-divider')];
+
+        handles.forEach((handle, i) => {
+            handle.addEventListener('pointerdown', e => {
+                if (e.button !== 0 || (e.target as Element).closest('.act')) {
+                    return; // accept/ignore buttons keep working
+                }
+                e.preventDefault();
+                const widths = panes.map(p => p.getBoundingClientRect().width);
+                const pair = widths[i] + widths[i + 1];
+                const startX = e.clientX;
+                handle.setPointerCapture(e.pointerId);
+                document.body.classList.add('mg-resizing');
+
+                const move = (ev: PointerEvent) => {
+                    const left = Math.min(Math.max(widths[i] + ev.clientX - startX, MIN_PANE_WIDTH), pair - MIN_PANE_WIDTH);
+                    const next = [...widths];
+                    next[i] = left;
+                    next[i + 1] = pair - left;
+                    setWidths(next);
+                };
+                const end = () => {
+                    document.body.classList.remove('mg-resizing');
+                    handle.removeEventListener('pointermove', move);
+                    handle.removeEventListener('pointerup', end);
+                    handle.removeEventListener('pointercancel', end);
+                    this.scheduleRender();
+                };
+                handle.addEventListener('pointermove', move);
+                handle.addEventListener('pointerup', end);
+                handle.addEventListener('pointercancel', end);
+            });
+            handle.addEventListener('dblclick', e => {
+                if (!(e.target as Element).closest('.act')) {
+                    setWidths([1, 1, 1]);
+                }
+            });
+        });
     }
 
     dispose(): void {

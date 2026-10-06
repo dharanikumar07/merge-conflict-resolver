@@ -204,6 +204,11 @@ html, body {
     overflow: visible;
 }
 
+/* The dividers are splitters: drag to resize the neighbouring panes, double-click for equal widths. */
+.col-divider .col-header, .connector { cursor: col-resize; }
+.col-divider .col-header:hover, body.mg-resizing .col-divider .col-header { box-shadow: inset 0 -2px 0 var(--vscode-sash-hoverBorder, var(--vscode-focusBorder)); }
+body.mg-resizing, body.mg-resizing * { cursor: col-resize !important; user-select: none; }
+
 .gutter {
     position: relative;
     flex: none;
