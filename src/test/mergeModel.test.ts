@@ -75,10 +75,37 @@ test('accept yours / accept theirs on separate conflicts', () => {
     doc.apply(model.accept(second, 'theirs'));
     doc.apply(model.accept(first, 'ours'));
     assert.equal(doc.text, lines('a1', 'b', 'c', 'd', 'e', 'f', 'g2'));
+    // Like PhpStorm, the other side's change stays pending until it is ignored (✕) or appended.
+    assert.equal(first.theirsState, 'pending');
+    assert.equal(second.oursState, 'pending');
+    assert.equal(model.stats().unresolvedConflicts, 2);
+    model.ignore(first, 'theirs', doc.text.slice(first.start, first.end));
+    model.ignore(second, 'ours', doc.text.slice(second.start, second.end));
     assert.ok(first.resolved && second.resolved);
-    assert.equal(first.theirsState, 'ignored');
-    assert.equal(second.oursState, 'ignored');
+    assert.equal(doc.text, lines('a1', 'b', 'c', 'd', 'e', 'f', 'g2'), 'ignoring keeps the accepted text');
     assert.equal(model.stats().unresolvedConflicts, 0);
+});
+
+test('accepting the second side of a conflict appends it after the first (PhpStorm "Append")', () => {
+    const ours = BASE.replace('c\n', 'c-ours\n');
+    const theirs = BASE.replace('c\n', 'c-theirs\n');
+    {
+        const { model, doc } = setup(BASE, ours, theirs);
+        const c = model.chunks[0];
+        doc.apply(model.accept(c, 'theirs'));
+        assert.equal(c.resolved, false);
+        doc.apply(model.accept(c, 'ours'));
+        assert.equal(doc.text, BASE.replace('c\n', 'c-theirs\nc-ours\n'));
+        assert.equal(c.resolved, true);
+        assert.equal(model.accept(c, 'ours'), undefined, 'an applied side cannot be applied twice');
+    }
+    {
+        const { model, doc } = setup('a\nb', 'a\nb-ours', 'a\nb-theirs');
+        const c = model.chunks[0];
+        doc.apply(model.accept(c, 'ours'));
+        doc.apply(model.accept(c, 'theirs'));
+        assert.equal(doc.text, 'a\nb-ours\nb-theirs', 'a line break is inserted between texts without one');
+    }
 });
 
 test('accept both, and ignore then accept the other side', () => {
@@ -132,7 +159,7 @@ test('undo of an accept restores the unresolved state, redo-equivalent restores 
     const { model, doc } = setup(BASE, BASE.replace('c\n', 'c-ours\n'), BASE.replace('c\n', 'c-theirs\n'));
     const c = model.chunks[0];
     doc.apply(model.accept(c, 'ours'));
-    assert.equal(c.resolved, true);
+    assert.equal(c.oursState, 'applied');
     doc.undo();
     assert.equal(doc.text, BASE);
     assert.equal(c.resolved, false);

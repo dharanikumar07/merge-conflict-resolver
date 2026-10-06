@@ -116,19 +116,21 @@ export class MergeModel {
 
     // ---- Actions. Each returns the edit to apply to the result document (if any) and updates chunk state. ----
 
-    /** Accept one side's change. For a conflict, this resolves it (the other side is ignored). */
+    /**
+     * Accept one side's change. Like PhpStorm, accepting one side of a conflict leaves the other side pending (its
+     * arrow stays until it is ignored); if the other side was already accepted, this side is appended after it.
+     */
     accept(chunk: MergeChunk, side: Side): ResultEdit | undefined {
-        if (chunk.state(side) === 'none') {
+        if (chunk.state(side) !== 'pending') {
             return undefined;
         }
         if (chunk.kind === 'both') {
             return this.plan(chunk, chunk.oursText, 'applied', 'applied');
         }
         const other: Side = side === 'ours' ? 'theirs' : 'ours';
-        const otherState: SideState = chunk.state(other) === 'pending' ? 'ignored' : chunk.state(other);
-        return side === 'ours'
-            ? this.plan(chunk, chunk.oursText, 'applied', otherState)
-            : this.plan(chunk, chunk.theirsText, otherState, 'applied');
+        const otherState = chunk.state(other);
+        const text = otherState === 'applied' ? this.join(chunk.sideText(other), chunk.sideText(side)) : chunk.sideText(side);
+        return side === 'ours' ? this.plan(chunk, text, 'applied', otherState) : this.plan(chunk, text, otherState, 'applied');
     }
 
     /** Accept both sides of a conflict: Yours followed by Theirs. */
@@ -137,8 +139,7 @@ export class MergeModel {
             return this.accept(chunk, first);
         }
         const [a, b] = first === 'ours' ? [chunk.oursText, chunk.theirsText] : [chunk.theirsText, chunk.oursText];
-        const joined = a.length > 0 && !a.endsWith('\n') && b.length > 0 ? a + this.eol + b : a + b;
-        return this.plan(chunk, joined, 'applied', 'applied');
+        return this.plan(chunk, this.join(a, b), 'applied', 'applied');
     }
 
     /** Ignore one side's change: the result region keeps its current content (`currentText`). */
@@ -220,6 +221,11 @@ export class MergeModel {
         for (const c of touched) {
             c.syncWithText(getText(c.start, c.end));
         }
+    }
+
+    /** Concatenates two side texts, inserting a line break when the first does not end with one. */
+    private join(a: string, b: string): string {
+        return a.length > 0 && !a.endsWith('\n') && b.length > 0 ? a + this.eol + b : a + b;
     }
 
     private plan(chunk: MergeChunk, text: string, ours: SideState, theirs: SideState): ResultEdit | undefined {

@@ -7,6 +7,7 @@ import { execFileSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { acceptFile, cancelMerge } from '../../commands/completeMerge';
 import type { MergeResolverApi } from '../../extension';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -44,123 +45,122 @@ export async function run(): Promise<void> {
     const extension = vscode.extensions.all.find(e => e.packageJSON.name === 'phpstorm-merge-extension')!;
     const api = (extension.isActive ? extension.exports : await extension.activate()) as MergeResolverApi;
 
-    await step('opens three side-by-side panes: Yours | Result | Theirs', async () => {
+    await step('opens the PhpStorm-style merge editor (webview) for the file', async () => {
         await vscode.commands.executeCommand('phpstorm-merge.open', fileUri);
-        const session = await waitFor('session', () => api.sessions.forFile(fileUri)?.ready && api.sessions.forFile(fileUri));
-        assert.equal(vscode.window.tabGroups.all.length, 3);
-        const byColumn = (col: vscode.ViewColumn) => vscode.window.visibleTextEditors.find(e => e.viewColumn === col)?.document.uri.toString();
-        assert.equal(byColumn(vscode.ViewColumn.One), session.uris.ours.toString());
-        assert.equal(byColumn(vscode.ViewColumn.Two), session.uris.result.toString());
-        assert.equal(byColumn(vscode.ViewColumn.Three), session.uris.theirs.toString());
-        assert.equal(vscode.window.activeTextEditor?.document.uri.toString(), session.uris.result.toString(), 'Result is focused');
-        assert.equal(vscode.window.activeTextEditor?.document.languageId, 'typescript', 'syntax highlighting language');
+        const session = await waitFor('session', () => api.sessions.forFile(fileUri)?.ready && api.sessions.forFile(fileUri), 15000);
+        const reply = await session.request('sync'); // proves the webview script, Monaco and the model loaded
+        assert.equal(session.active, true, 'merge panel is focused');
         assert.equal(session.source.labels.oursLabel, 'main');
         assert.equal(session.source.labels.theirsLabel, 'feature');
-        assert.deepEqual(session.model.chunks.map(c => c.kind), ['ours', 'conflict', 'theirs', 'conflict']);
+        assert.equal(session.source.languageId, 'typescript');
+        assert.deepEqual(reply.chunks.map(c => c.kind), ['ours', 'conflict', 'theirs', 'conflict']);
+        assert.equal(reply.result, session.source.texts.base, 'Result starts as Base');
+        assert.equal(reply.state.stats.unresolvedConflicts, 2);
     });
 
     const session = api.sessions.forFile(fileUri)!;
-    const resultDoc = () => session.resultDocument!;
-
-    await step('Yours and Theirs panes are read-only', async () => {
-        for (const [uri, column] of [[session.uris.ours, vscode.ViewColumn.One], [session.uris.theirs, vscode.ViewColumn.Three]] as const) {
-            const editor = await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(uri), { viewColumn: column });
-            const before = editor.document.getText();
-            await vscode.commands.executeCommand('type', { text: 'typed by user' });
-            await vscode.commands.executeCommand('deleteLeft');
-            assert.equal(editor.document.getText(), before);
-            assert.equal(editor.document.isDirty, false);
-        }
-        // Return focus to the Result with the cursor in the first conflict, as after opening.
-        await vscode.window.showTextDocument(resultDoc(), { viewColumn: vscode.ViewColumn.Two });
-        session.reveal(session.model.conflicts[0]);
-    });
-
-    await step('CodeLens actions are offered in all three panes', async () => {
-        const titles = async (uri: vscode.Uri) =>
-            ((await vscode.commands.executeCommand<vscode.CodeLens[]>('vscode.executeCodeLensProvider', uri)) ?? []).map(l => l.command?.title ?? '');
-        const result = await titles(session.uris.result);
-        assert.ok(result.some(t => t.includes('Conflict 1 of 2')), result.join(' | '));
-        assert.ok(result.includes('Accept Yours') && result.includes('Accept Theirs'));
-        assert.ok(result.some(t => t.includes('Resolve Simple')), 'conflict 2 is simple');
-        assert.ok((await titles(session.uris.ours)).includes('$(arrow-right) Accept'));
-        assert.ok((await titles(session.uris.theirs)).includes('$(arrow-left) Accept'));
-    });
+    const conflictIds = (await session.request('sync')).chunks.filter(c => c.kind === 'conflict').map(c => c.id);
 
     await step('apply non-conflicting changes', async () => {
         await vscode.commands.executeCommand('phpstorm-merge.applyNonConflicting', session.id);
-        const text = resultDoc().getText();
-        assert.ok(text.includes('import { log } from "./log";'), text);
-        assert.ok(text.includes('export const VERSION = 2;'), text);
-        assert.equal(session.model.stats().pendingChanges, 0);
+        const reply = await session.request('sync');
+        assert.ok(reply.result.includes('import { log } from "./log";'), reply.result);
+        assert.ok(reply.result.includes('export const VERSION = 2;'), reply.result);
+        assert.equal(reply.state.stats.pendingChanges, 0);
     });
 
-    await step('Accept Yours on the conflict under the cursor (opened at the first conflict)', async () => {
-        await vscode.commands.executeCommand('phpstorm-merge.acceptYours');
-        assert.ok(resultDoc().getText().includes('return "hello from main";'));
-        assert.equal(session.model.conflicts[0].resolved, true);
+    await step('accepting one side keeps the other side pending until it is ignored (PhpStorm behaviour)', async () => {
+        const [first] = conflictIds;
+        await vscode.commands.executeCommand('phpstorm-merge.acceptYours', session.id, first);
+        let reply = await session.request('sync');
+        let chunk = reply.chunks.find(c => c.id === first)!;
+        assert.ok(reply.result.includes('return "hello from main";'));
+        assert.equal(chunk.ours, 'applied');
+        assert.equal(chunk.theirs, 'pending', 'the right arrow stays');
+        assert.equal(chunk.resolved, false);
+        await vscode.commands.executeCommand('phpstorm-merge.ignoreTheirs', session.id, first);
+        reply = await session.request('sync');
+        chunk = reply.chunks.find(c => c.id === first)!;
+        assert.equal(chunk.resolved, true);
+        assert.equal(reply.state.stats.unresolvedConflicts, 1);
     });
 
-    await step('undo restores the conflict; next conflict navigation; status updates', async () => {
-        await vscode.commands.executeCommand('undo');
-        await waitFor('undo applied', () => !session.model.conflicts[0].resolved);
-        assert.ok(!resultDoc().getText().includes('hello from main'));
-        await vscode.commands.executeCommand('redo');
-        await waitFor('redo applied', () => session.model.conflicts[0].resolved);
+    await step('accepting the other side appends it; revert; resolve simple', async () => {
+        const second = conflictIds[1];
+        await vscode.commands.executeCommand('phpstorm-merge.acceptTheirs', session.id, second);
+        let reply = await session.request('acceptYours', { chunkId: second });
+        assert.ok(reply.result.includes('    const greeting = "Hello, World" + suffix.trim();\n    const greeting = "Hello, World!!" + suffix;\n'), reply.result);
+        assert.equal(reply.chunks.find(c => c.id === second)!.resolved, true);
+        await vscode.commands.executeCommand('phpstorm-merge.revertResolution', session.id, second);
+        reply = await session.request('sync');
+        assert.equal(reply.chunks.find(c => c.id === second)!.resolved, false);
+        await vscode.commands.executeCommand('phpstorm-merge.resolveSimple', session.id, second);
+        reply = await session.request('sync');
+        assert.ok(reply.result.includes('const greeting = "Hello, World!!" + suffix.trim();'), reply.result);
+        assert.equal(reply.state.stats.unresolvedConflicts, 0);
+    });
+
+    await step('commands without arguments act on the focused merge editor', async () => {
+        await vscode.commands.executeCommand('phpstorm-merge.revertResolution', session.id, conflictIds[0]);
         await vscode.commands.executeCommand('phpstorm-merge.nextConflict');
-        assert.equal(session.currentChunkId, session.model.conflicts[1].id);
-    });
-
-    await step('Accept Theirs, then Revert Resolution, then Resolve Simple', async () => {
-        const second = session.model.conflicts[1];
-        await vscode.commands.executeCommand('phpstorm-merge.acceptTheirs', session.id, second.id);
-        assert.equal(second.resolved, true);
-        await vscode.commands.executeCommand('phpstorm-merge.revertResolution', session.id, second.id);
-        assert.equal(second.resolved, false);
-        await vscode.commands.executeCommand('phpstorm-merge.resolveSimple', session.id, second.id);
-        assert.ok(resultDoc().getText().includes('const greeting = "Hello, World!!" + suffix.trim();'), resultDoc().getText());
-    });
-
-    await step('manual typing inside a conflict resolves it', async () => {
-        await vscode.commands.executeCommand('phpstorm-merge.revertResolution', session.id, session.model.conflicts[0].id);
-        const first = session.model.conflicts[0];
-        const doc = resultDoc();
-        const edit = new vscode.WorkspaceEdit();
-        edit.replace(doc.uri, new vscode.Range(doc.positionAt(first.start), doc.positionAt(first.end)), '    return "hand-merged";\n');
-        assert.ok(await vscode.workspace.applyEdit(edit));
-        await waitFor('manual edit tracked', () => first.edited);
-        assert.equal(session.model.stats().unresolvedConflicts, 0);
+        const reply = await session.request('sync');
+        assert.equal(reply.state.currentConflict, 1);
+        await vscode.commands.executeCommand('phpstorm-merge.acceptTheirs');
+        await vscode.commands.executeCommand('phpstorm-merge.ignoreYours');
+        const after = await session.request('sync');
+        assert.ok(after.result.includes('return "hello from feature";'), after.result);
+        assert.equal(after.state.stats.unresolvedConflicts, 0);
     });
 
     await step('re-opening an in-progress file returns to the same session', async () => {
-        const text = resultDoc().getText();
+        const text = await session.resultText();
         await vscode.commands.executeCommand('phpstorm-merge.open', fileUri);
         assert.equal(api.sessions.forFile(fileUri), session);
-        assert.equal(resultDoc().getText(), text);
+        assert.equal(await session.resultText(), text);
     });
 
-    await step('Complete Merge writes the real file, stages it, does not commit', async () => {
+    await step('Compare opens a VS Code diff with a snapshot of the Result', async () => {
+        await vscode.commands.executeCommand('phpstorm-merge.compareResultBase');
+        const diff = await waitFor('diff tab', () => vscode.window.tabGroups.activeTabGroup.activeTab?.input instanceof vscode.TabInputTextDiff
+            && vscode.window.tabGroups.activeTabGroup.activeTab.input as vscode.TabInputTextDiff);
+        const doc = await vscode.workspace.openTextDocument(diff.modified);
+        assert.equal(doc.getText(), await session.resultText());
+        session.show();
+        await waitFor('merge panel focused', () => session.active);
+    });
+
+    await step('Apply (Complete Merge) writes the real file, stages it, does not commit', async () => {
         const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' });
-        const expected = resultDoc().getText();
+        const expected = await session.resultText();
         await vscode.commands.executeCommand('phpstorm-merge.completeMerge', session.id);
         assert.equal(fs.readFileSync(fileUri.fsPath, 'utf8'), expected);
         const unmerged = execFileSync('git', ['ls-files', '-u'], { cwd: root, encoding: 'utf8' });
         assert.ok(!unmerged.includes('app.ts'), unmerged);
         assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }), head);
         await waitFor('session closed', () => !api.sessions.forFile(fileUri));
-        assert.ok(!vscode.window.tabGroups.all.flatMap(g => g.tabs).some(t => t.input instanceof vscode.TabInputText && t.input.uri.scheme.startsWith('phpmerge')));
+        assert.ok(!vscode.window.tabGroups.all.flatMap(g => g.tabs).some(t => t.input instanceof vscode.TabInputWebview));
     });
 
-    await step('closing the Result tab ends the session without touching the file', async () => {
+    await step('Cancel closes the merge editor without touching the file', async () => {
         const notes = vscode.Uri.file(path.join(root, 'notes.txt'));
         const before = fs.readFileSync(notes.fsPath, 'utf8');
         await vscode.commands.executeCommand('phpstorm-merge.open', notes);
-        const s = await waitFor('notes session', () => api.sessions.forFile(notes)?.ready && api.sessions.forFile(notes));
-        await vscode.commands.executeCommand('phpstorm-merge.acceptTheirs');
-        const tab = vscode.window.tabGroups.all.flatMap(g => g.tabs).find(t => t.input instanceof vscode.TabInputText && t.input.uri.toString() === s.uris.result.toString())!;
-        await s.resultDocument!.save(); // avoid the "save changes?" prompt in the test
-        await vscode.window.tabGroups.close(tab);
+        const s = await waitFor('notes session', () => api.sessions.forFile(notes)?.ready && api.sessions.forFile(notes), 15000);
+        await s.request('sync');
+        await cancelMerge(api.sessions, s); // Result unchanged, so no confirmation
         await waitFor('session disposed', () => !api.sessions.forFile(notes));
         assert.equal(fs.readFileSync(notes.fsPath, 'utf8'), before);
+    });
+
+    await step('Accept Right resolves the whole file with Theirs and stages it', async () => {
+        const notes = vscode.Uri.file(path.join(root, 'notes.txt'));
+        await vscode.commands.executeCommand('phpstorm-merge.open', notes);
+        const s = await waitFor('notes session', () => api.sessions.forFile(notes)?.ready && api.sessions.forFile(notes), 15000);
+        await s.request('sync');
+        await acceptFile(api.sessions, s, 'theirs');
+        assert.equal(fs.readFileSync(notes.fsPath, 'utf8'), 'shared\nline theirs\n');
+        const unmerged = execFileSync('git', ['ls-files', '-u'], { cwd: root, encoding: 'utf8' });
+        assert.ok(!unmerged.includes('notes.txt'), unmerged);
+        await waitFor('session disposed', () => !api.sessions.forFile(notes));
     });
 }

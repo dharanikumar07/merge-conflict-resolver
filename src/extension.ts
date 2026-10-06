@@ -1,10 +1,8 @@
 import * as vscode from 'vscode';
-import { abortMerge, completeMerge } from './commands/completeMerge';
+import { abortMerge, acceptFile, cancelMerge, completeMerge } from './commands/completeMerge';
 import { openMergeEditor } from './commands/openMergeEditor';
 import { compare, ComparisonId, registerResolveCommands } from './commands/resolveConflict';
-import { MergeDecorations } from './editor/decorations';
-import { RESULT_SCHEME, ResultFileSystem, REVISION_SCHEME, RevisionContentProvider } from './editor/documents';
-import { MergeCodeLensProvider } from './editor/MergeCodeLensProvider';
+import { REVISION_SCHEME, RevisionContentProvider } from './editor/documents';
 import { SessionManager } from './editor/SessionManager';
 import { getGitApi } from './git/gitExtension';
 import { ConflictListProvider } from './views/ConflictListProvider';
@@ -25,9 +23,7 @@ export interface MergeResolverApi {
 
 export async function activate(context: vscode.ExtensionContext): Promise<MergeResolverApi> {
     const revisions = new RevisionContentProvider();
-    const results = new ResultFileSystem();
-    const decorations = new MergeDecorations();
-    const sessions = new SessionManager({ revisions, results, decorations });
+    const sessions = new SessionManager({ revisions, extensionUri: context.extensionUri });
     const conflictList = new ConflictListProvider(await getGitApi(), sessions);
     const treeView = vscode.window.createTreeView('mergeConflictsView', { treeDataProvider: conflictList });
     conflictList.attach(treeView);
@@ -42,15 +38,22 @@ export async function activate(context: vscode.ExtensionContext): Promise<MergeR
             }
         });
 
-    const selector: vscode.DocumentSelector = [{ scheme: REVISION_SCHEME }, { scheme: RESULT_SCHEME }];
+    // Buttons in the merge webview that need the host.
+    sessions.onMessage((session, message) => {
+        switch (message.type) {
+            case 'apply': return completeMerge(sessions, session.id);
+            case 'acceptFile': return acceptFile(sessions, session, message.side);
+            case 'cancel': return cancelMerge(sessions, session);
+            case 'compare': return compare(sessions, session.id, message.which);
+        }
+    });
+
     context.subscriptions.push(
-        decorations,
+        revisions,
         sessions,
         conflictList,
         treeView,
         vscode.workspace.registerTextDocumentContentProvider(REVISION_SCHEME, revisions),
-        vscode.workspace.registerFileSystemProvider(RESULT_SCHEME, results, { isCaseSensitive: true }),
-        vscode.languages.registerCodeLensProvider(selector, new MergeCodeLensProvider(sessions)),
         command('phpstorm-merge.open', arg => openMergeEditor(sessions, arg)),
         command('phpstorm-merge.refresh', () => conflictList.refresh()),
         command('phpstorm-merge.completeMerge', id => completeMerge(sessions, id)),
@@ -59,7 +62,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<MergeR
         ...registerResolveCommands(sessions, command),
     );
 
-    await sessions.closeStaleTabs();
     return { sessions };
 }
 

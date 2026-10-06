@@ -1,0 +1,339 @@
+/* PhpStorm-style merge dialog. Workbench colors come from VS Code (--vscode-*); change colors follow PhpStorm's
+   diff palette and can be overridden with the phpstormMerge.* colors in `workbench.colorCustomizations`. */
+
+body {
+    --mg-conflict-bg: var(--vscode-phpstormMerge-conflictBackground, #4a2e2a);
+    --mg-conflict-word: var(--vscode-phpstormMerge-conflictWordBackground, #713b33);
+    --mg-conflict-border: var(--vscode-phpstormMerge-conflictBorder, #a05a4c);
+    --mg-conflict-icon: #f28b76;
+    --mg-modified-bg: var(--vscode-phpstormMerge-modifiedBackground, #253a50);
+    --mg-modified-word: var(--vscode-phpstormMerge-modifiedWordBackground, #2f5a88);
+    --mg-modified-border: var(--vscode-phpstormMerge-modifiedBorder, #4c7db3);
+    --mg-modified-icon: #7db3f5;
+    --mg-added-bg: var(--vscode-phpstormMerge-addedBackground, #263e2d);
+    --mg-added-word: var(--vscode-phpstormMerge-addedWordBackground, #31633e);
+    --mg-added-border: var(--vscode-phpstormMerge-addedBorder, #4c8b5b);
+    --mg-added-icon: #77cc8a;
+    --mg-deleted-bg: var(--vscode-phpstormMerge-deletedBackground, #393c3e);
+    --mg-deleted-word: var(--vscode-phpstormMerge-deletedWordBackground, #54585b);
+    --mg-deleted-border: var(--vscode-phpstormMerge-deletedBorder, #737b81);
+    --mg-deleted-icon: #b4bbc1;
+    --mg-button-hover: rgba(255, 255, 255, 0.12);
+    --mg-chrome: var(--vscode-editorGroupHeader-tabsBackground, var(--vscode-sideBar-background, var(--vscode-editor-background)));
+    --mg-separator: var(--vscode-editorGroup-border, rgba(128, 128, 128, 0.35));
+}
+
+body.vscode-light {
+    --mg-conflict-bg: var(--vscode-phpstormMerge-conflictBackground, #ffe4dd);
+    --mg-conflict-word: var(--vscode-phpstormMerge-conflictWordBackground, #ffc3b4);
+    --mg-conflict-border: var(--vscode-phpstormMerge-conflictBorder, #ef9a85);
+    --mg-conflict-icon: #cf4126;
+    --mg-modified-bg: var(--vscode-phpstormMerge-modifiedBackground, #dde8fb);
+    --mg-modified-word: var(--vscode-phpstormMerge-modifiedWordBackground, #b8cef6);
+    --mg-modified-border: var(--vscode-phpstormMerge-modifiedBorder, #86a9e6);
+    --mg-modified-icon: #2563c9;
+    --mg-added-bg: var(--vscode-phpstormMerge-addedBackground, #dcf1dc);
+    --mg-added-word: var(--vscode-phpstormMerge-addedWordBackground, #b2deb2);
+    --mg-added-border: var(--vscode-phpstormMerge-addedBorder, #7bbf7b);
+    --mg-added-icon: #2a8a2a;
+    --mg-deleted-bg: var(--vscode-phpstormMerge-deletedBackground, #ececec);
+    --mg-deleted-word: var(--vscode-phpstormMerge-deletedWordBackground, #d2d2d2);
+    --mg-deleted-border: var(--vscode-phpstormMerge-deletedBorder, #b1b1b1);
+    --mg-deleted-icon: #5f5f5f;
+    --mg-button-hover: rgba(0, 0, 0, 0.08);
+}
+
+.mg-conflict { --mg-bg: var(--mg-conflict-bg); --mg-word: var(--mg-conflict-word); --mg-border: var(--mg-conflict-border); --mg-icon: var(--mg-conflict-icon); }
+.mg-modified { --mg-bg: var(--mg-modified-bg); --mg-word: var(--mg-modified-word); --mg-border: var(--mg-modified-border); --mg-icon: var(--mg-modified-icon); }
+.mg-added { --mg-bg: var(--mg-added-bg); --mg-word: var(--mg-added-word); --mg-border: var(--mg-added-border); --mg-icon: var(--mg-added-icon); }
+.mg-deleted { --mg-bg: var(--mg-deleted-bg); --mg-word: var(--mg-deleted-word); --mg-border: var(--mg-deleted-border); --mg-icon: var(--mg-deleted-icon); }
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: var(--vscode-editor-background);
+    color: var(--vscode-foreground);
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size, 13px);
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* ---- Toolbar ---- */
+
+.toolbar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    padding: 0 8px;
+    background: var(--mg-chrome);
+    border-bottom: 1px solid var(--mg-separator);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.tb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 26px;
+    min-width: 26px;
+    padding: 0 5px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--vscode-icon-foreground, var(--vscode-foreground));
+    font: inherit;
+    cursor: pointer;
+}
+
+.tb:hover { background: var(--vscode-toolbar-hoverBackground, var(--mg-button-hover)); }
+.tb:active { background: var(--vscode-toolbar-activeBackground, var(--mg-button-hover)); }
+.tb:focus-visible, .act:focus-visible, .btn:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 1px; }
+.tb-text span { font-size: 12px; color: var(--vscode-foreground); }
+.tb-toggle svg { visibility: hidden; color: var(--vscode-textLink-foreground); }
+.tb-toggle.on svg { visibility: visible; }
+
+.tb-label {
+    margin: 0 4px 0 2px;
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+}
+
+.sep {
+    flex: none;
+    width: 1px;
+    height: 18px;
+    margin: 0 6px;
+    background: var(--mg-separator);
+}
+
+.spacer { flex: 1; }
+
+.status {
+    padding-left: 12px;
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+}
+
+.status .done {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    vertical-align: middle;
+    color: var(--vscode-testing-iconPassed, #73c991);
+}
+
+.status a, .col-header .details {
+    color: var(--vscode-textLink-foreground);
+    text-decoration: none;
+}
+
+.status a:hover, .col-header .details:hover { text-decoration: underline; }
+
+/* ---- Panes ---- */
+
+.panes {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.col-side, .col-result { flex: 1 1 0; }
+.col-divider { flex: none; }
+
+.col-header {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+    background: var(--mg-chrome);
+    border-bottom: 1px solid var(--mg-separator);
+}
+
+.col-divider .col-header { padding: 0; }
+.col-header svg { flex: none; opacity: 0.85; }
+.col-header .label { overflow: hidden; text-overflow: ellipsis; }
+.col-header b, .col-header .title { color: var(--vscode-foreground); font-weight: 600; }
+.col-header .details { margin-left: auto; padding-left: 8px; }
+.col-header .path { overflow: hidden; text-overflow: ellipsis; opacity: 0.85; }
+
+.editor {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+
+/* ---- Dividers: line numbers, accept/ignore buttons, connector bands ---- */
+
+.divider {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--vscode-editorGutter-background, var(--vscode-editor-background));
+    cursor: default;
+    user-select: none;
+}
+
+.connector {
+    flex: none;
+    display: block;
+    overflow: visible;
+}
+
+.gutter {
+    position: relative;
+    flex: none;
+    overflow: hidden;
+    font-family: var(--vscode-editor-font-family);
+    font-size: var(--vscode-editor-font-size);
+}
+
+.divider-ours .gutter { border-left: 1px solid var(--mg-separator); }
+.divider-theirs .gutter { border-right: 1px solid var(--mg-separator); }
+
+.ln {
+    position: absolute;
+    box-sizing: border-box;
+    width: var(--numbers-width);
+    padding-right: 8px;
+    text-align: right;
+    color: var(--vscode-editorLineNumber-foreground);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.divider-ours .ln { left: var(--actions-width); }
+.divider-theirs .ln { left: 0; }
+
+.g-block {
+    position: absolute;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    background: var(--mg-bg);
+    border-top: 1px solid var(--mg-border);
+    border-bottom: 1px solid var(--mg-border);
+}
+
+.g-mark {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--mg-border);
+}
+
+.band-fill { fill: var(--mg-bg); stroke: none; }
+.band-edge { fill: none; stroke: var(--mg-border); stroke-width: 1; }
+
+.acts {
+    position: absolute;
+    display: flex;
+    gap: 2px;
+    height: 20px;
+    z-index: 2;
+}
+
+.divider-ours .acts { left: 3px; }
+.divider-theirs .acts { left: calc(var(--numbers-width) + 1px); }
+
+.act {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.act svg { stroke-width: 2; }
+.act-accept { color: var(--mg-icon); }
+.act-accept:hover { background: var(--mg-button-hover); box-shadow: inset 0 0 0 1px var(--mg-icon); }
+.act-ignore { color: var(--vscode-descriptionForeground, #9da5ab); }
+.act-ignore:hover { color: var(--vscode-errorForeground, #f48771); background: var(--mg-button-hover); }
+
+/* ---- Decorations inside the Monaco editors ---- */
+
+.mg-line, .mg-margin { background: var(--mg-bg); }
+.mg-edge-top { box-shadow: inset 0 1px 0 var(--mg-border); }
+.mg-edge-bottom { box-shadow: inset 0 -1px 0 var(--mg-border); }
+.mg-edge-top.mg-edge-bottom { box-shadow: inset 0 1px 0 var(--mg-border), inset 0 -1px 0 var(--mg-border); }
+.mg-mark-top { box-shadow: inset 0 2px 0 var(--mg-border); }
+.mg-mark-bottom { box-shadow: inset 0 -2px 0 var(--mg-border); }
+.mg-word { background: var(--mg-word); border-radius: 2px; }
+
+.mg-wand {
+    cursor: pointer;
+    background-color: var(--mg-conflict-icon);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M2.5 13.5 10 6M8.5 4.5l3 3M12.5 1.5v2.5M11.25 2.75h2.5M14 6.5v2M13 7.5h2M5.5 1.5v2M4.5 2.5h2'/%3E%3C/svg%3E") center / 15px no-repeat;
+}
+
+/* ---- Footer ---- */
+
+.footer {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 48px;
+    padding: 0 14px;
+    background: var(--mg-chrome);
+    border-top: 1px solid var(--mg-separator);
+}
+
+.btn {
+    height: 28px;
+    padding: 0 14px;
+    border: 1px solid var(--vscode-button-border, rgba(128, 128, 128, 0.4));
+    border-radius: 4px;
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    font: inherit;
+    cursor: pointer;
+}
+
+.btn:hover { background: var(--vscode-button-secondaryHoverBackground); }
+
+.btn.primary {
+    min-width: 84px;
+    border-color: transparent;
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+}
+
+.btn.primary:hover { background: var(--vscode-button-hoverBackground); }
+
+/* Narrow editor groups: keep the icons and the status, drop the labels. */
+@media (max-width: 1100px) {
+    .tb-label, .tb-text span, .col-header .details { display: none; }
+}

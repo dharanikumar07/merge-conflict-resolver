@@ -22,8 +22,7 @@ export function uriFromArg(arg: unknown): vscode.Uri | undefined {
 }
 
 export async function openMergeEditor(sessions: SessionManager, arg?: unknown): Promise<void> {
-    const activeUri = vscode.window.activeTextEditor?.document.uri;
-    const fileUri = uriFromArg(arg) ?? (activeUri && sessions.forUri(activeUri)?.source.fileUri) ?? activeUri;
+    const fileUri = uriFromArg(arg) ?? sessions.active()?.source.fileUri ?? vscode.window.activeTextEditor?.document.uri;
     if (!fileUri || fileUri.scheme !== 'file') {
         void vscode.window.showErrorMessage('Merge Resolver: select a conflicted file to open.');
         return;
@@ -31,7 +30,7 @@ export async function openMergeEditor(sessions: SessionManager, arg?: unknown): 
 
     const existing = sessions.forFile(fileUri);
     if (existing) {
-        await existing.show();
+        existing.show();
         return;
     }
 
@@ -79,31 +78,22 @@ export async function openMergeEditor(sessions: SessionManager, arg?: unknown): 
 
     const eol = working ? (working.eol === vscode.EndOfLine.CRLF ? '\r\n' : '\n') : detectEol(texts.ours);
     const labels: MergeStatus = git ? await git.getMergeStatus() : { operation: 'none', oursLabel: 'Yours', theirsLabel: 'Theirs' };
+    // Normalizes line endings and computes the initial counts; the webview builds the same model from these texts.
+    const model = MergeModel.create(texts.base, texts.ours, texts.theirs, eol);
     const session = sessions.create({
         fileUri,
         git,
         relativePath,
-        model: MergeModel.create(texts.base, texts.ours, texts.theirs, eol),
+        texts: { base: model.base, ours: model.ours, theirs: model.theirs },
+        eol,
+        initialStats: model.stats(),
         labels,
         languageId: working?.languageId ?? 'plaintext',
         workingSnapshot: working?.getText(),
     });
-
-    try {
-        await session.show();
-    } catch (error) {
-        await sessions.close(session);
-        throw error;
-    }
-
-    if (vscode.workspace.getConfiguration('phpstormMerge').get<boolean>('autoApplyNonConflictingChanges')) {
-        await session.applyEdits(session.model.applyNonConflicting('all'));
-    }
-    const first = session.model.conflicts[0];
-    if (first) {
-        session.reveal(first);
-    } else if (session.model.chunks.length === 0) {
-        void vscode.window.showInformationMessage(`Yours and Theirs are identical for ${name}. Use Complete Merge to mark it resolved.`);
+    session.show();
+    if (model.chunks.length === 0) {
+        void vscode.window.showInformationMessage(`Yours and Theirs are identical for ${name}. Click Apply to mark it resolved.`);
     }
     sessions.scheduleRefresh();
 }

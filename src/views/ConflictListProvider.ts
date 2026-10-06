@@ -93,7 +93,7 @@ export class ConflictListProvider implements vscode.TreeDataProvider<Node>, vsco
         const root = repository.rootUri.fsPath + path.sep;
         const conflicted = repository.state.mergeChanges.map(c => {
             const session = this.sessions.forFile(c.uri);
-            const progress = session ? progressOf(session.model.stats()) : undefined;
+            const progress = session ? progressOf(session.state.stats) : undefined;
             return new FileNode(c.uri, false, progress);
         });
         const completed = [...this.sessions.completedFiles]

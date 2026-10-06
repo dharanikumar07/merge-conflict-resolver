@@ -1,0 +1,16 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "target": "ES2022",
+        "noEmit": true,
+        "rootDir": "..",
+        "baseUrl": "../..",
+        "paths": {
+            "monaco-editor/*": ["node_modules/monaco-editor/esm/vs/*"]
+        },
+        "types": []
+    },
+    "include": ["./**/*.ts", "../shared/**/*.ts", "../merge/**/*.ts"],
+    "exclude": []
+}

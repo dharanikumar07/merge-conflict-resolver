@@ -4,6 +4,7 @@ import { findConflictMarkerLine } from '../git/GitConflictParser';
 import { GitService } from '../git/GitService';
 import { MergeSession } from '../editor/MergeSession';
 import { SessionManager } from '../editor/SessionManager';
+import type { Side } from '../shared/protocol';
 import { sessionFromArgs } from './resolveConflict';
 
 /**
@@ -15,17 +16,17 @@ export async function completeMerge(sessions: SessionManager, sessionId?: unknow
     if (!session) {
         return;
     }
-    const { model } = session;
-    const stats = model.stats();
+    let reply = await session.request('sync');
+    const { stats } = reply.state;
 
     if (stats.unresolvedConflicts > 0) {
         const choice = await vscode.window.showWarningMessage(
             `${session.fileName} still has ${stats.unresolvedConflicts} unresolved conflict(s).`,
-            { modal: true, detail: 'Resolve every conflict (accept, ignore or edit it) before completing the merge.' },
+            { modal: true, detail: 'Resolve every conflict before applying: accept (≫ / ≪) or ignore (✕) both of its sides, or edit it in the Result.' },
             'Go to Next Conflict',
         );
         if (choice) {
-            await vscode.commands.executeCommand('phpstorm-merge.nextConflict', session.id);
+            await session.request('nextConflict');
         }
         return;
     }
@@ -42,11 +43,11 @@ export async function completeMerge(sessions: SessionManager, sessionId?: unknow
             return;
         }
         if (choice === APPLY) {
-            await session.applyEdits(model.applyNonConflicting('all'));
+            reply = await session.request('applyNonConflicting');
         }
     }
 
-    const result = session.resultText();
+    const result = reply.result;
     const markerLine = findConflictMarkerLine(result);
     if (markerLine >= 0) {
         const choice = await vscode.window.showWarningMessage(
@@ -55,27 +56,55 @@ export async function completeMerge(sessions: SessionManager, sessionId?: unknow
             'Complete Anyway',
         );
         if (!choice) {
-            const editor = session.visibleEditors('result')[0];
-            if (editor) {
-                const pos = new vscode.Position(markerLine, 0);
-                editor.selection = new vscode.Selection(pos, pos);
-                editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
-            }
+            await session.request('revealLine', { line: markerLine });
             return;
         }
     }
 
+    await finish(sessions, session, result);
+}
+
+/** "Accept Left" / "Accept Right": resolves the whole file with one version, like PhpStorm. */
+export async function acceptFile(sessions: SessionManager, session: MergeSession, side: Side): Promise<void> {
+    const name = side === 'ours' ? `Yours (${session.source.labels.oursLabel})` : `Theirs (${session.source.labels.theirsLabel})`;
+    if (session.state.dirty) {
+        const choice = await vscode.window.showWarningMessage(
+            `Resolve ${session.fileName} with ${name}?`,
+            { modal: true, detail: 'The changes you made in the Result are discarded and the file is replaced with this version.' },
+            'Use This Version',
+        );
+        if (!choice) {
+            return;
+        }
+    }
+    await finish(sessions, session, session.source.texts[side]);
+}
+
+/** "Cancel": closes the merge editor without touching the file. */
+export async function cancelMerge(sessions: SessionManager, session: MergeSession): Promise<void> {
+    if (session.state.dirty) {
+        const choice = await vscode.window.showWarningMessage(
+            `Discard the merge of ${session.fileName}?`,
+            { modal: true, detail: 'The changes in the Result are lost. The file stays conflicted.' },
+            'Discard',
+        );
+        if (!choice) {
+            return;
+        }
+    }
+    await sessions.close(session);
+}
+
+async function finish(sessions: SessionManager, session: MergeSession, result: string): Promise<void> {
     if (!(await writeResult(session, result))) {
         return;
     }
-
     try {
         await session.source.git?.markResolved(session.source.relativePath);
     } catch (error) {
         void vscode.window.showErrorMessage(`Saved ${session.fileName}, but could not mark it resolved: ${(error as Error).message}`);
         return;
     }
-
     sessions.completedFiles.add(session.source.fileUri.fsPath);
     await sessions.close(session);
     void offerNextFile(session); // don't keep the command pending while the notification is visible

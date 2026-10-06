@@ -7,7 +7,7 @@
             "group": "build",
             "problemMatcher": [],
             "label": "npm: bundle",
-            "detail": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify"
+            "detail": "node scripts/build.mjs"
         }
     ]
 }

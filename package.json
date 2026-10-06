@@ -1,7 +1,7 @@
 {
   "name": "phpstorm-merge-extension",
   "displayName": "PhpStorm-Style Merge Resolver",
-  "description": "A lightweight three-pane (Yours | Result | Theirs) Git merge conflict resolver modelled on PhpStorm.",
+  "description": "A three-pane (Yours | Result | Theirs) Git merge conflict resolver modelled on PhpStorm, with clickable accept/ignore arrows.",
   "version": "0.0.1",
   "publisher": "your-publisher-id",
   "engines": {
@@ -63,13 +63,13 @@
       },
       {
         "command": "phpstorm-merge.acceptYours",
-        "title": "Accept Yours",
+        "title": "Accept Left (Yours)",
         "category": "Merge Resolver",
         "icon": "$(arrow-right)"
       },
       {
         "command": "phpstorm-merge.acceptTheirs",
-        "title": "Accept Theirs",
+        "title": "Accept Right (Theirs)",
         "category": "Merge Resolver",
         "icon": "$(arrow-left)"
       },
@@ -80,17 +80,23 @@
       },
       {
         "command": "phpstorm-merge.ignoreYours",
-        "title": "Ignore Yours",
+        "title": "Ignore Left (Yours)",
         "category": "Merge Resolver"
       },
       {
         "command": "phpstorm-merge.ignoreTheirs",
-        "title": "Ignore Theirs",
+        "title": "Ignore Right (Theirs)",
         "category": "Merge Resolver"
       },
       {
         "command": "phpstorm-merge.resolveSimple",
         "title": "Resolve Simple Conflict",
+        "category": "Merge Resolver",
+        "icon": "$(wand)"
+      },
+      {
+        "command": "phpstorm-merge.resolveAllSimple",
+        "title": "Resolve All Simple Conflicts",
         "category": "Merge Resolver",
         "icon": "$(wand)"
       },
@@ -202,6 +208,10 @@
           "when": "phpstormMerge.inSession"
         },
         {
+          "command": "phpstorm-merge.resolveAllSimple",
+          "when": "phpstormMerge.inSession"
+        },
+        {
           "command": "phpstorm-merge.applyNonConflicting",
           "when": "phpstormMerge.inSession"
         },
@@ -252,95 +262,9 @@
       ],
       "editor/title": [
         {
-          "command": "phpstorm-merge.previousConflict",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "navigation@1"
-        },
-        {
-          "command": "phpstorm-merge.nextConflict",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "navigation@2"
-        },
-        {
-          "command": "phpstorm-merge.applyNonConflicting",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "navigation@3"
-        },
-        {
-          "submenu": "phpstorm-merge.compareMenu",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "navigation@4"
-        },
-        {
-          "command": "phpstorm-merge.completeMerge",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "navigation@5"
-        },
-        {
-          "command": "phpstorm-merge.applyNonConflictingYours",
-          "when": "resource =~ /^phpmerge-rev:\\/\\d+\\/ours\\//",
-          "group": "navigation@1"
-        },
-        {
-          "command": "phpstorm-merge.applyNonConflictingTheirs",
-          "when": "resource =~ /^phpmerge-rev:\\/\\d+\\/theirs\\//",
-          "group": "navigation@1"
-        },
-        {
-          "command": "phpstorm-merge.resolveSimple",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "1_merge@1"
-        },
-        {
-          "command": "phpstorm-merge.revertResolution",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "1_merge@2"
-        },
-        {
-          "command": "phpstorm-merge.applyNonConflictingYours",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "1_merge@3"
-        },
-        {
-          "command": "phpstorm-merge.applyNonConflictingTheirs",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "1_merge@4"
-        },
-        {
-          "command": "phpstorm-merge.abortMerge",
-          "when": "resourceScheme == phpmerge-result",
-          "group": "2_abort@1"
-        },
-        {
           "command": "phpstorm-merge.open",
           "when": "resourceScheme == file && resourcePath in phpstormMerge.conflictedPaths",
           "group": "navigation"
-        }
-      ],
-      "phpstorm-merge.compareMenu": [
-        {
-          "command": "phpstorm-merge.compareYoursTheirs",
-          "group": "navigation@0"
-        },
-        {
-          "command": "phpstorm-merge.compareYoursBase",
-          "group": "navigation@1"
-        },
-        {
-          "command": "phpstorm-merge.compareTheirsBase",
-          "group": "navigation@2"
-        },
-        {
-          "command": "phpstorm-merge.compareResultYours",
-          "group": "navigation@3"
-        },
-        {
-          "command": "phpstorm-merge.compareResultTheirs",
-          "group": "navigation@4"
-        },
-        {
-          "command": "phpstorm-merge.compareResultBase",
-          "group": "navigation@5"
         }
       ],
       "explorer/context": [
@@ -382,35 +306,16 @@
         }
       ]
     },
-    "submenus": [
-      {
-        "id": "phpstorm-merge.compareMenu",
-        "label": "Compare",
-        "icon": "$(git-compare)"
-      }
-    ],
     "keybindings": [
       {
         "command": "phpstorm-merge.nextConflict",
         "key": "f7",
-        "when": "phpstormMerge.inSession && editorTextFocus"
+        "when": "activeWebviewPanelId == 'phpstormMerge.mergeEditor'"
       },
       {
         "command": "phpstorm-merge.previousConflict",
         "key": "shift+f7",
-        "when": "phpstormMerge.inSession && editorTextFocus"
-      },
-      {
-        "command": "phpstorm-merge.acceptYours",
-        "key": "ctrl+alt+right",
-        "mac": "ctrl+cmd+right",
-        "when": "phpstormMerge.inSession && editorTextFocus"
-      },
-      {
-        "command": "phpstorm-merge.acceptTheirs",
-        "key": "ctrl+alt+left",
-        "mac": "ctrl+cmd+left",
-        "when": "phpstormMerge.inSession && editorTextFocus"
+        "when": "activeWebviewPanelId == 'phpstormMerge.mergeEditor'"
       }
     ],
     "configuration": {
@@ -426,51 +331,131 @@
     "colors": [
       {
         "id": "phpstormMerge.conflictBackground",
-        "description": "Background of unresolved conflicts in the merge resolver.",
+        "description": "Background of unresolved conflicts in the merge editor.",
         "defaults": {
-          "dark": "diffEditor.removedLineBackground",
-          "light": "diffEditor.removedLineBackground",
-          "highContrast": "diffEditor.removedLineBackground",
-          "highContrastLight": "diffEditor.removedLineBackground"
+          "dark": "#4a2e2a",
+          "light": "#ffe4dd",
+          "highContrast": "#5a2f28",
+          "highContrastLight": "#ffe4dd"
+        }
+      },
+      {
+        "id": "phpstormMerge.conflictWordBackground",
+        "description": "Background of changed words inside conflicts.",
+        "defaults": {
+          "dark": "#713b33",
+          "light": "#ffc3b4",
+          "highContrast": "#713b33",
+          "highContrastLight": "#ffc3b4"
+        }
+      },
+      {
+        "id": "phpstormMerge.conflictBorder",
+        "description": "Outline and connector edge of conflicts.",
+        "defaults": {
+          "dark": "#a05a4c",
+          "light": "#ef9a85",
+          "highContrast": "#f28b76",
+          "highContrastLight": "#ef9a85"
         }
       },
       {
         "id": "phpstormMerge.modifiedBackground",
-        "description": "Background of modified lines (relative to Base) in the merge resolver.",
+        "description": "Background of modified lines (non-conflicting changes).",
         "defaults": {
-          "dark": "merge.incomingContentBackground",
-          "light": "merge.incomingContentBackground",
-          "highContrast": "merge.incomingContentBackground",
-          "highContrastLight": "merge.incomingContentBackground"
+          "dark": "#253a50",
+          "light": "#dde8fb",
+          "highContrast": "#1f3d5c",
+          "highContrastLight": "#dde8fb"
+        }
+      },
+      {
+        "id": "phpstormMerge.modifiedWordBackground",
+        "description": "Background of changed words inside modified lines.",
+        "defaults": {
+          "dark": "#2f5a88",
+          "light": "#b8cef6",
+          "highContrast": "#2f5a88",
+          "highContrastLight": "#b8cef6"
+        }
+      },
+      {
+        "id": "phpstormMerge.modifiedBorder",
+        "description": "Outline and connector edge of modified lines.",
+        "defaults": {
+          "dark": "#4c7db3",
+          "light": "#86a9e6",
+          "highContrast": "#7db3f5",
+          "highContrastLight": "#86a9e6"
         }
       },
       {
         "id": "phpstormMerge.addedBackground",
-        "description": "Background of added lines (relative to Base) in the merge resolver.",
+        "description": "Background of added lines (non-conflicting changes).",
         "defaults": {
-          "dark": "diffEditor.insertedLineBackground",
-          "light": "diffEditor.insertedLineBackground",
-          "highContrast": "diffEditor.insertedLineBackground",
-          "highContrastLight": "diffEditor.insertedLineBackground"
+          "dark": "#263e2d",
+          "light": "#dcf1dc",
+          "highContrast": "#1f4a2a",
+          "highContrastLight": "#dcf1dc"
+        }
+      },
+      {
+        "id": "phpstormMerge.addedWordBackground",
+        "description": "Background of changed words inside added lines.",
+        "defaults": {
+          "dark": "#31633e",
+          "light": "#b2deb2",
+          "highContrast": "#31633e",
+          "highContrastLight": "#b2deb2"
+        }
+      },
+      {
+        "id": "phpstormMerge.addedBorder",
+        "description": "Outline and connector edge of added lines.",
+        "defaults": {
+          "dark": "#4c8b5b",
+          "light": "#7bbf7b",
+          "highContrast": "#77cc8a",
+          "highContrastLight": "#7bbf7b"
         }
       },
       {
         "id": "phpstormMerge.deletedBackground",
-        "description": "Background of lines that a side deletes, shown in the Result.",
+        "description": "Background of lines a side deletes.",
         "defaults": {
-          "dark": "merge.commonContentBackground",
-          "light": "merge.commonContentBackground",
-          "highContrast": "merge.commonContentBackground",
-          "highContrastLight": "merge.commonContentBackground"
+          "dark": "#393c3e",
+          "light": "#ececec",
+          "highContrast": "#3a3a3a",
+          "highContrastLight": "#ececec"
+        }
+      },
+      {
+        "id": "phpstormMerge.deletedWordBackground",
+        "description": "Background of deleted words.",
+        "defaults": {
+          "dark": "#54585b",
+          "light": "#d2d2d2",
+          "highContrast": "#54585b",
+          "highContrastLight": "#d2d2d2"
+        }
+      },
+      {
+        "id": "phpstormMerge.deletedBorder",
+        "description": "Outline and connector edge of deleted lines.",
+        "defaults": {
+          "dark": "#737b81",
+          "light": "#b1b1b1",
+          "highContrast": "#b4bbc1",
+          "highContrastLight": "#b1b1b1"
         }
       }
     ]
   },
   "scripts": {
     "vscode:prepublish": "npm run bundle",
-    "bundle": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
-    "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
-    "compile": "tsc -p ./",
+    "bundle": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "compile": "tsc -p ./ && tsc -p src/webview",
     "test": "npm run compile && node --test \"out/test/**/*.test.js\"",
     "lint": "eslint src --ext ts",
     "test:e2e": "npm run compile && npm run bundle && node out/test/e2e/launch.js"
@@ -478,8 +463,9 @@
   "devDependencies": {
     "@types/node": "16.x",
     "@types/vscode": "^1.70.0",
-    "esbuild": "^0.15.5",
+    "esbuild": "^0.25.12",
     "eslint": "^8.20.0",
+    "monaco-editor": "^0.57.0",
     "typescript": "^4.7.4"
   },
   "dependencies": {
