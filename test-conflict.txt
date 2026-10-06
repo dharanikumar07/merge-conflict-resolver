@@ -74,7 +74,7 @@ notifications:
 
 integrations:
   github:
-    enabled: true
+    enabled: false
     api-url: https://api.github.com
 
   stripe:
@@ -87,7 +87,7 @@ integrations:
 
 storage:
   provider: s3
-  bucket: flowforge-development
+  bucket: flowforge-development-java
   region: us-east-1
 
 scheduler:
@@ -121,7 +121,7 @@ features:
   github-trigger: true
   slack-trigger: true
   email-action: true
-  http-action: true
+  http-action: false
 
 backup:
   enabled: true
@@ -136,11 +136,12 @@ development:
 testing:
   enabled: true
   integration-tests: true
-  test-database: flowforge_test
+  test-database: flowferge_testing_map
 
 performance:
   cache-enabled: true
   compression-enabled: true
+  readability: high
   batch-size: 100
 
 monitoring:
