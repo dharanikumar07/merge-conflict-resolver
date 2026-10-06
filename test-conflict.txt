@@ -7,9 +7,9 @@ application:
   debug: false
 
 server:
-  host: 127.0.0.1
-  port: 8081
-  context-path: /service
+  host: 127.0.0.1.19
+  port: 8083s
+  context-path: /api
 
 database:
   driver: postgresql
@@ -24,10 +24,10 @@ database:
     connection-timeout: 45000
 
 redis:
-  host: localhost
+  host: staging-redis.example.com
   port: 6379
-  database: 0
-  timeout: 2000
+  database: 2
+  timeout: 3000
   enabled: true
 
 kafka:
@@ -36,7 +36,7 @@ kafka:
   topic:
     workflow-events: workflow-events
     task-events: task-events
-    notification-events: notification-events
+    notification-events: job-events
 
 workflow:
   enabled: true
@@ -96,16 +96,16 @@ scheduler:
 
 worker:
   enabled: true
-  threads: 10
+  threads: 100
   queue-size: 500
 
 metrics:
-  enabled: true
+  enabled: false
   endpoint: /actuator/metrics
 
 health:
   enabled: true
-  enabled: based_on_main_config
+  enabled: basedon config
   endpoint: /actuator/health
 
 api:
@@ -146,8 +146,8 @@ performance:
 
 monitoring:
   prometheus: true
-  grafana: true
-  tracing: false
+  grafana: false
+  tracing: true
 
 shutdown:
   graceful: true
