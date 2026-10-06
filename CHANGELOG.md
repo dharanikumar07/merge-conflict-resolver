@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Added screenshots and an animated walkthrough to the Marketplace page.
+
 ## 0.1.1
 
 - Added the MIT license.

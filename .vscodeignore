@@ -36,3 +36,7 @@ test-conflict.txt
 
 # Full-size logo source (the packaged icon is images/icon.png)
 media/mergeflow_logo.png
+
+# README media: the Marketplace page loads these from the GitHub repository, so they are not needed in the package
+images/screenshot-*.png
+images/*.gif

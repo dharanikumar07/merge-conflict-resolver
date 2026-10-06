@@ -6,6 +6,8 @@
 
 MergeFlow is a Git merge conflict resolver for Visual Studio Code with a clean three-pane layout: **Yours | Result | Theirs**. You can see both versions side by side, take changes with one click, and edit the final result directly.
 
+![Resolving a merge conflict with MergeFlow: apply non-conflicting changes, accept or ignore each side, finish with Apply](images/mergeflow-walkthrough.gif)
+
 ## Features
 
 - **Three-pane merge editor.** *Yours* (read-only) on the left, the editable *Result* in the middle, *Theirs* (read-only) on the right, with syntax highlighting.
@@ -83,19 +85,17 @@ The change colors can be customized with the `mergeflow.*` colors in `workbench.
 
 ## Screenshots
 
-<!--
-  TODO: add screenshots before publishing. Put the image files in the `images/` folder and reference them with
-  relative paths, for example:
+**The three-pane merge editor.** Yours (left), the editable Result (middle) and Theirs (right). Conflicts are red; non-conflicting changes are green (added), blue (modified) or grey (deleted). Click `≫` / `≪` to accept a change and `✕` to ignore it.
 
-  ![Three-pane merge editor](images/screenshot-merge-editor.png)
-  ![Resolving a conflict](images/screenshot-resolve.png)
-  ![Merge Conflicts view](images/screenshot-conflicts-view.png)
+![Three-pane merge editor with conflicts and non-conflicting changes](images/screenshot-merge-editor.png)
 
-  When packaging, vsce rewrites relative image paths to the public GitHub repository, so the images must be pushed
-  there. Use PNG or JPG: the Marketplace does not allow SVG images in the README.
--->
+**Accepting one side of a conflict.** After `≫` on the left, the Result contains the left change, and the right side keeps its arrow. Click `↲` to append the right change as well, or `✕` to ignore it.
 
-_Screenshots coming soon._
+![After accepting the left side of a conflict, the right side can still be appended or ignored](images/screenshot-accept-one-side.png)
+
+**Every change processed.** Click **Apply** to save the file and mark it as resolved in Git.
+
+![All changes processed, ready to apply](images/screenshot-resolved.png)
 
 ## Requirements
 
