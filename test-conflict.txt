@@ -1,15 +1,15 @@
 # FlowForge Configuration
 
 application:
-  name: FlowForge Platform
-  version: 2.0.0
-  environment: staging
-  debug: true
+  name: FlowForge
+  version: 1.0.0
+  environment: production
+  debug: false
 
 server:
-  host: 127.0.0.1.19
-  port: 8083s
-  context-path: /service
+  host: 0.0.0.0
+  port: 9090
+  context-path: /v1
 
 database:
   driver: postgresql
@@ -40,10 +40,10 @@ kafka:
 
 workflow:
   enabled: true
-  max-retries: 5
-  retry-delay: 10000
-  execution-timeout: 600000
-  max-concurrent-executions: 50
+  max-retries: 2
+  retry-delay: 3000
+  execution-timeout: 180000
+  max-concurrent-executions: 25
 
 logging:
   level: INFO
@@ -97,7 +97,7 @@ scheduler:
 
 worker:
   enabled: true
-  threads: 100
+  threads: 10
   queue-size: 500
 
 metrics:
@@ -149,5 +149,14 @@ monitoring:
   prometheus: true
   grafana: false
   tracing: true
+
+  metrics:
+  enabled: true
+  endpoint: /actuator/prometheus
+
+  backup:
+  enabled: true
+  interval: hourly
+  retention-days: 30
 
 # End of configuration
