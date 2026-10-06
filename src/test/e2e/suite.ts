@@ -42,7 +42,7 @@ export async function run(): Promise<void> {
 
     const root = vscode.workspace.workspaceFolders![0].uri.fsPath;
     const fileUri = vscode.Uri.file(path.join(root, 'app.ts'));
-    const extension = vscode.extensions.all.find(e => e.packageJSON.name === 'phpstorm-merge-extension')!;
+    const extension = vscode.extensions.all.find(e => e.packageJSON.name === 'mergeflow')!;
     const api = (extension.isActive ? extension.exports : await extension.activate()) as MergeResolverApi;
 
     await step('opens the PhpStorm-style merge editor (webview) for the file', async () => {

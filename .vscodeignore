@@ -1,0 +1,38 @@
+# Files left out of the packaged extension (.vsix).
+# At runtime the extension only needs: package.json, dist/ (bundled by esbuild, including the `diff` dependency and
+# the Monaco webview), media/merge-*.svg (merge tab icons), images/icon.png, README.md and CHANGELOG.md.
+
+# Dependencies are bundled into dist/ by scripts/build.mjs
+node_modules/**
+
+# Sources, build scripts and compiler output
+src/**
+scripts/**
+out/**
+**/*.ts
+**/*.map
+**/tsconfig*.json
+*.tsbuildinfo
+
+# Tests and sample data
+test/**
+tests/**
+coverage/**
+.vscode-test/**
+test-conflict.txt
+
+# Editor, OS and repository files
+.git/**
+.github/**
+.gitignore
+.vscode/**
+.idea/**
+.claude/**
+**/.DS_Store
+*.vsix
+.eslintrc*
+.env
+.env.*
+
+# Full-size logo source (the packaged icon is images/icon.png)
+media/mergeflow_logo.png

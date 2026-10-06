@@ -1,9 +1,22 @@
 {
-  "name": "phpstorm-merge-extension",
-  "displayName": "PhpStorm-Style Merge Resolver",
-  "description": "A three-pane (Yours | Result | Theirs) Git merge conflict resolver modelled on PhpStorm, with clickable accept/ignore arrows.",
-  "version": "0.0.1",
+  "name": "mergeflow",
+  "displayName": "MergeFlow",
+  "description": "A modern Git merge conflict resolver with a clean three-pane experience.",
+  "version": "0.1.0",
   "publisher": "your-publisher-id",
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#0d1117",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dharanikumar07/merge-conflict-resolver.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dharanikumar07/merge-conflict-resolver/issues"
+  },
+  "homepage": "https://github.com/dharanikumar07/merge-conflict-resolver#readme",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -13,6 +26,16 @@
   "categories": [
     "SCM Providers",
     "Other"
+  ],
+  "keywords": [
+    "merge",
+    "git",
+    "conflict",
+    "merge conflict",
+    "conflict resolver",
+    "three way merge",
+    "source control",
+    "developer tools"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -40,136 +63,136 @@
       {
         "command": "phpstorm-merge.open",
         "title": "Open in Merge Resolver",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(git-merge)"
       },
       {
         "command": "phpstorm-merge.refresh",
         "title": "Refresh Conflicts",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(refresh)"
       },
       {
         "command": "phpstorm-merge.nextConflict",
         "title": "Next Conflict",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(arrow-down)"
       },
       {
         "command": "phpstorm-merge.previousConflict",
         "title": "Previous Conflict",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(arrow-up)"
       },
       {
         "command": "phpstorm-merge.acceptYours",
         "title": "Accept Left (Yours)",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(arrow-right)"
       },
       {
         "command": "phpstorm-merge.acceptTheirs",
         "title": "Accept Right (Theirs)",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(arrow-left)"
       },
       {
         "command": "phpstorm-merge.acceptBoth",
         "title": "Accept Both (Yours, then Theirs)",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.ignoreYours",
         "title": "Ignore Left (Yours)",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.ignoreTheirs",
         "title": "Ignore Right (Theirs)",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.resolveSimple",
         "title": "Resolve Simple Conflict",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(wand)"
       },
       {
         "command": "phpstorm-merge.resolveAllSimple",
         "title": "Resolve All Simple Conflicts",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(wand)"
       },
       {
         "command": "phpstorm-merge.applyNonConflicting",
         "title": "Apply All Non-Conflicting Changes",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(check-all)"
       },
       {
         "command": "phpstorm-merge.applyNonConflictingYours",
         "title": "Apply Non-Conflicting Changes from Yours",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(arrow-right)"
       },
       {
         "command": "phpstorm-merge.applyNonConflictingTheirs",
         "title": "Apply Non-Conflicting Changes from Theirs",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(arrow-left)"
       },
       {
         "command": "phpstorm-merge.revertResolution",
         "title": "Revert Conflict Resolution",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(discard)"
       },
       {
         "command": "phpstorm-merge.compare",
         "title": "Compare...",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(git-compare)"
       },
       {
         "command": "phpstorm-merge.compareYoursTheirs",
         "title": "Compare Yours with Theirs",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.compareYoursBase",
         "title": "Compare Yours with Base",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.compareTheirsBase",
         "title": "Compare Theirs with Base",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.compareResultYours",
         "title": "Compare Result with Yours",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.compareResultTheirs",
         "title": "Compare Result with Theirs",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.compareResultBase",
         "title": "Compare Result with Base",
-        "category": "Merge Resolver"
+        "category": "MergeFlow"
       },
       {
         "command": "phpstorm-merge.completeMerge",
         "title": "Complete Merge",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(check)"
       },
       {
         "command": "phpstorm-merge.abortMerge",
         "title": "Abort Merge...",
-        "category": "Merge Resolver",
+        "category": "MergeFlow",
         "icon": "$(close)"
       }
     ],
@@ -319,7 +342,7 @@
       }
     ],
     "configuration": {
-      "title": "Merge Resolver",
+      "title": "MergeFlow",
       "properties": {
         "phpstormMerge.autoApplyNonConflictingChanges": {
           "type": "boolean",

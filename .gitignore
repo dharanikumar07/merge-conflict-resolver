@@ -3,3 +3,9 @@ dist
 out
 *.vsix
 .DS_Store
+.vscode-test
+coverage
+*.tsbuildinfo
+.env
+.env.*
+.idea/
