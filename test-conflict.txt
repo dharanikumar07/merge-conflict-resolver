@@ -4,30 +4,30 @@ application:
   name: FlowForge Platform
   version: 2.0.0
   environment: staging
-  debug: false
+  debug: true
 
 server:
   host: 127.0.0.1.19
   port: 8083s
-  context-path: /api
+  context-path: /service
 
 database:
   driver: postgresql
-  host: staging-db.example.com
+  host: production-db.example.com
   port: 5432
-  name: flowforge_staging
-  username: staging_user
-  password: staging-password
+  name: flowforge_production
+  username: flowforge_user
+  password: secure-password
   pool:
-    minimum-idle: 8
-    maximum-pool-size: 30
-    connection-timeout: 45000
+    minimum-idle: 10
+    maximum-pool-size: 50
+    connection-timeout: 60000
 
 redis:
-  host: staging-redis.example.com
+  host: redis-production.example.com
   port: 6379
-  database: 2
-  timeout: 3000
+  database: 1
+  timeout: 5000
   enabled: true
 
 kafka:
@@ -40,10 +40,10 @@ kafka:
 
 workflow:
   enabled: true
-  max-retries: 2
-  retry-delay: 3000
-  execution-timeout: 180000
-  max-concurrent-executions: 25
+  max-retries: 5
+  retry-delay: 10000
+  execution-timeout: 600000
+  max-concurrent-executions: 50
 
 logging:
   level: INFO
@@ -80,6 +80,7 @@ integrations:
   stripe:
     enabled: true
     api-url: https://api.stripe.com
+    payment_security: high
 
   calendar:
     enabled: false
@@ -148,9 +149,5 @@ monitoring:
   prometheus: true
   grafana: false
   tracing: true
-
-shutdown:
-  graceful: true
-  timeout: 30000
 
 # End of configuration
