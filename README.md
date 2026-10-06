@@ -125,6 +125,4 @@ Contributions are welcome:
 
 ## License
 
-<!-- TODO: choose a license, add a LICENSE file and a "license" field in package.json, then update this section. -->
-
-A license has not been chosen yet.
+MergeFlow is released under the [MIT License](LICENSE).

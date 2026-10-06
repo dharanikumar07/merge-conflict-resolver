@@ -2,8 +2,9 @@
   "name": "mergeflow",
   "displayName": "MergeFlow",
   "description": "A modern Git merge conflict resolver with a clean three-pane experience.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "mergeflow",
+  "license": "MIT",
   "icon": "images/icon.png",
   "galleryBanner": {
     "color": "#0d1117",
