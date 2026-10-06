@@ -1,20 +1,21 @@
 {
   "name": "phpstorm-merge-extension",
-  "displayName": "PhpStorm Style Merge",
-  "description": "A lightweight 3-panel merge conflict resolver like PhpStorm.",
+  "displayName": "PhpStorm-Style Merge Resolver",
+  "description": "A lightweight three-pane (Yours | Result | Theirs) Git merge conflict resolver modelled on PhpStorm.",
   "version": "0.0.1",
   "publisher": "your-publisher-id",
   "engines": {
-    "vscode": "^1.70.0"
+    "vscode": "^1.80.0"
   },
   "extensionDependencies": [
     "vscode.git"
   ],
   "categories": [
+    "SCM Providers",
     "Other"
   ],
   "activationEvents": [
-    "onView:mergeConflictsView"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -31,43 +32,457 @@
       "phpstorm-merge-sidebar": [
         {
           "id": "mergeConflictsView",
-          "name": "Conflicted Files"
+          "name": "Merge Conflicts"
         }
       ]
     },
     "commands": [
       {
         "command": "phpstorm-merge.open",
-        "title": "Open in PhpStorm Merge Tool",
-        "icon": "$(go-to-file)"
+        "title": "Open in Merge Resolver",
+        "category": "Merge Resolver",
+        "icon": "$(git-merge)"
       },
       {
         "command": "phpstorm-merge.refresh",
         "title": "Refresh Conflicts",
+        "category": "Merge Resolver",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "phpstorm-merge.nextConflict",
+        "title": "Next Conflict",
+        "category": "Merge Resolver",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "phpstorm-merge.previousConflict",
+        "title": "Previous Conflict",
+        "category": "Merge Resolver",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "phpstorm-merge.acceptYours",
+        "title": "Accept Yours",
+        "category": "Merge Resolver",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "phpstorm-merge.acceptTheirs",
+        "title": "Accept Theirs",
+        "category": "Merge Resolver",
+        "icon": "$(arrow-left)"
+      },
+      {
+        "command": "phpstorm-merge.acceptBoth",
+        "title": "Accept Both (Yours, then Theirs)",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.ignoreYours",
+        "title": "Ignore Yours",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.ignoreTheirs",
+        "title": "Ignore Theirs",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.resolveSimple",
+        "title": "Resolve Simple Conflict",
+        "category": "Merge Resolver",
+        "icon": "$(wand)"
+      },
+      {
+        "command": "phpstorm-merge.applyNonConflicting",
+        "title": "Apply All Non-Conflicting Changes",
+        "category": "Merge Resolver",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "phpstorm-merge.applyNonConflictingYours",
+        "title": "Apply Non-Conflicting Changes from Yours",
+        "category": "Merge Resolver",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "phpstorm-merge.applyNonConflictingTheirs",
+        "title": "Apply Non-Conflicting Changes from Theirs",
+        "category": "Merge Resolver",
+        "icon": "$(arrow-left)"
+      },
+      {
+        "command": "phpstorm-merge.revertResolution",
+        "title": "Revert Conflict Resolution",
+        "category": "Merge Resolver",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "phpstorm-merge.compare",
+        "title": "Compare...",
+        "category": "Merge Resolver",
+        "icon": "$(git-compare)"
+      },
+      {
+        "command": "phpstorm-merge.compareYoursTheirs",
+        "title": "Compare Yours with Theirs",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.compareYoursBase",
+        "title": "Compare Yours with Base",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.compareTheirsBase",
+        "title": "Compare Theirs with Base",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.compareResultYours",
+        "title": "Compare Result with Yours",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.compareResultTheirs",
+        "title": "Compare Result with Theirs",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.compareResultBase",
+        "title": "Compare Result with Base",
+        "category": "Merge Resolver"
+      },
+      {
+        "command": "phpstorm-merge.completeMerge",
+        "title": "Complete Merge",
+        "category": "Merge Resolver",
+        "icon": "$(check)"
+      },
+      {
+        "command": "phpstorm-merge.abortMerge",
+        "title": "Abort Merge...",
+        "category": "Merge Resolver",
+        "icon": "$(close)"
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "phpstorm-merge.nextConflict",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.previousConflict",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.acceptYours",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.acceptTheirs",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.acceptBoth",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.ignoreYours",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.ignoreTheirs",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.resolveSimple",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.applyNonConflicting",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.applyNonConflictingYours",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.applyNonConflictingTheirs",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.revertResolution",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.compare",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.compareYoursTheirs",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.compareYoursBase",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.compareTheirsBase",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.compareResultYours",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.compareResultTheirs",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.compareResultBase",
+          "when": "phpstormMerge.inSession"
+        },
+        {
+          "command": "phpstorm-merge.completeMerge",
+          "when": "phpstormMerge.inSession"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "phpstorm-merge.previousConflict",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "navigation@1"
+        },
+        {
+          "command": "phpstorm-merge.nextConflict",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "navigation@2"
+        },
+        {
+          "command": "phpstorm-merge.applyNonConflicting",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "navigation@3"
+        },
+        {
+          "submenu": "phpstorm-merge.compareMenu",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "navigation@4"
+        },
+        {
+          "command": "phpstorm-merge.completeMerge",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "navigation@5"
+        },
+        {
+          "command": "phpstorm-merge.applyNonConflictingYours",
+          "when": "resource =~ /^phpmerge-rev:\\/\\d+\\/ours\\//",
+          "group": "navigation@1"
+        },
+        {
+          "command": "phpstorm-merge.applyNonConflictingTheirs",
+          "when": "resource =~ /^phpmerge-rev:\\/\\d+\\/theirs\\//",
+          "group": "navigation@1"
+        },
+        {
+          "command": "phpstorm-merge.resolveSimple",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "1_merge@1"
+        },
+        {
+          "command": "phpstorm-merge.revertResolution",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "1_merge@2"
+        },
+        {
+          "command": "phpstorm-merge.applyNonConflictingYours",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "1_merge@3"
+        },
+        {
+          "command": "phpstorm-merge.applyNonConflictingTheirs",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "1_merge@4"
+        },
+        {
+          "command": "phpstorm-merge.abortMerge",
+          "when": "resourceScheme == phpmerge-result",
+          "group": "2_abort@1"
+        },
+        {
+          "command": "phpstorm-merge.open",
+          "when": "resourceScheme == file && resourcePath in phpstormMerge.conflictedPaths",
+          "group": "navigation"
+        }
+      ],
+      "phpstorm-merge.compareMenu": [
+        {
+          "command": "phpstorm-merge.compareYoursTheirs",
+          "group": "navigation@0"
+        },
+        {
+          "command": "phpstorm-merge.compareYoursBase",
+          "group": "navigation@1"
+        },
+        {
+          "command": "phpstorm-merge.compareTheirsBase",
+          "group": "navigation@2"
+        },
+        {
+          "command": "phpstorm-merge.compareResultYours",
+          "group": "navigation@3"
+        },
+        {
+          "command": "phpstorm-merge.compareResultTheirs",
+          "group": "navigation@4"
+        },
+        {
+          "command": "phpstorm-merge.compareResultBase",
+          "group": "navigation@5"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "phpstorm-merge.open",
+          "when": "resourceScheme == file && resourcePath in phpstormMerge.conflictedPaths",
+          "group": "3_compare"
+        }
+      ],
+      "scm/resourceState/context": [
+        {
+          "command": "phpstorm-merge.open",
+          "when": "scmProvider == git && scmResourceGroup == merge",
+          "group": "inline"
+        },
+        {
+          "command": "phpstorm-merge.open",
+          "when": "scmProvider == git && scmResourceGroup == merge",
+          "group": "navigation"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "phpstorm-merge.refresh",
+          "when": "view == mergeConflictsView",
+          "group": "navigation"
+        },
+        {
+          "command": "phpstorm-merge.abortMerge",
+          "when": "view == mergeConflictsView",
+          "group": "2_abort"
+        }
+      ],
       "view/item/context": [
         {
           "command": "phpstorm-merge.open",
+          "when": "view == mergeConflictsView && viewItem == conflictedFile",
           "group": "inline"
         }
       ]
-    }
+    },
+    "submenus": [
+      {
+        "id": "phpstorm-merge.compareMenu",
+        "label": "Compare",
+        "icon": "$(git-compare)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "phpstorm-merge.nextConflict",
+        "key": "f7",
+        "when": "phpstormMerge.inSession && editorTextFocus"
+      },
+      {
+        "command": "phpstorm-merge.previousConflict",
+        "key": "shift+f7",
+        "when": "phpstormMerge.inSession && editorTextFocus"
+      },
+      {
+        "command": "phpstorm-merge.acceptYours",
+        "key": "ctrl+alt+right",
+        "mac": "ctrl+cmd+right",
+        "when": "phpstormMerge.inSession && editorTextFocus"
+      },
+      {
+        "command": "phpstorm-merge.acceptTheirs",
+        "key": "ctrl+alt+left",
+        "mac": "ctrl+cmd+left",
+        "when": "phpstormMerge.inSession && editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Merge Resolver",
+      "properties": {
+        "phpstormMerge.autoApplyNonConflictingChanges": {
+          "type": "boolean",
+          "default": false,
+          "description": "Apply all non-conflicting changes automatically when a file is opened in the merge resolver (like PhpStorm's \"Automatically apply non-conflicting changes\")."
+        }
+      }
+    },
+    "colors": [
+      {
+        "id": "phpstormMerge.conflictBackground",
+        "description": "Background of unresolved conflicts in the merge resolver.",
+        "defaults": {
+          "dark": "diffEditor.removedLineBackground",
+          "light": "diffEditor.removedLineBackground",
+          "highContrast": "diffEditor.removedLineBackground",
+          "highContrastLight": "diffEditor.removedLineBackground"
+        }
+      },
+      {
+        "id": "phpstormMerge.modifiedBackground",
+        "description": "Background of modified lines (relative to Base) in the merge resolver.",
+        "defaults": {
+          "dark": "merge.incomingContentBackground",
+          "light": "merge.incomingContentBackground",
+          "highContrast": "merge.incomingContentBackground",
+          "highContrastLight": "merge.incomingContentBackground"
+        }
+      },
+      {
+        "id": "phpstormMerge.addedBackground",
+        "description": "Background of added lines (relative to Base) in the merge resolver.",
+        "defaults": {
+          "dark": "diffEditor.insertedLineBackground",
+          "light": "diffEditor.insertedLineBackground",
+          "highContrast": "diffEditor.insertedLineBackground",
+          "highContrastLight": "diffEditor.insertedLineBackground"
+        }
+      },
+      {
+        "id": "phpstormMerge.deletedBackground",
+        "description": "Background of lines that a side deletes, shown in the Result.",
+        "defaults": {
+          "dark": "merge.commonContentBackground",
+          "light": "merge.commonContentBackground",
+          "highContrast": "merge.commonContentBackground",
+          "highContrastLight": "merge.commonContentBackground"
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run bundle",
     "bundle": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
-    "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
+    "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
     "compile": "tsc -p ./",
-    "lint": "eslint src --ext ts"
+    "test": "npm run compile && node --test \"out/test/**/*.test.js\"",
+    "lint": "eslint src --ext ts",
+    "test:e2e": "npm run compile && npm run bundle && node out/test/e2e/launch.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.70.0",
     "@types/node": "16.x",
-    "typescript": "^4.7.4",
+    "@types/vscode": "^1.70.0",
     "esbuild": "^0.15.5",
-    "eslint": "^8.20.0"
+    "eslint": "^8.20.0",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "diff": "^8.0.3"
   }
 }
